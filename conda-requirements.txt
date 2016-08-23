@@ -1,0 +1,5 @@
+nomkl
+scipy
+numpy
+pandas
+flask
