@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import flask, send_from_directory
+import flask
 import predict
 import json
 import os
@@ -17,7 +17,7 @@ def main():
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'docs', 'img'),
+    return flask.send_from_directory(os.path.join(app.root_path, 'docs', 'img'),
                                'favicon.ico', mimetype='image/png')
 
 @app.after_request
