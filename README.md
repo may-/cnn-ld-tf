@@ -1,10 +1,9 @@
 # Convolutional Neural Network for Language Detection
 
-**Note:** 
+**Note:**  
+This is mostly based on https://github.com/yuhaozhang/sentence-convnet
 
 ---
-
-## Demo
 
 
 ## Requirements
@@ -19,7 +18,7 @@ To download TED corpus
 
 Web API
 
-- [Flask]()
+- [Flask](http://flask.pocoo.org/)
 
 ## Preprocess
 
@@ -44,8 +43,8 @@ python ./train.py
 ```python
 import predict
 
-res = predict.predict(u'日本語のテスト')
-print re['prediction']
+result = predict.predict(u'日本語のテスト')
+print result['prediction']
 ```
 
 ## Evaluation
@@ -64,29 +63,19 @@ tensorboard --logdir=./model/ted500/summaries
 
 ### Run API Server
 
-Deploy to Heroku 
-[![Heroku Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-```sh
-heroku create --buildpack https://github.com/kennethreitz/conda-buildpack.git cnn-ld-tf
-git push heroku master
-```
-
-or
 ```sh
 python ./main.py
 ```
 
 ### Request
 
-For example, send GET request as
-
 ```
-https://cnn-ld-tf.herokuapp.com/predict?text="日本語のテスト"
+http://localhost:5000/predict?text="日本語のテスト"
 ```
 
 ### Response
 
-```json
+```
 {
   "prediction": "ja", 
   "scores": {
@@ -155,61 +144,5 @@ Web API on heroku:
      "is", "it", "ja", "ka", "km", "kn", "ko", "ku", "lt", "mg", "ml",
      "mn", "ms", "my", "nb", "ne", "nl", "nn", "pl", "ps", "pt", "ro",
      "ru", "si", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "tg",
-     "th", "tl", "tr", "ug", "uk", "ur", "uz", "vi", "zh-cn", "zh-tw"]`
-
-* Results:
-
-    | best 10 | avg. score | precision | recall | f1 |
-    |--------:|-----------:|----------:|-------:|---:|
-    |Tamil  |1665.068186   |1.00    |1.00  |1.00|
-    |Sinhalese  |1242.680933   |1.00    |1.00  |1.00|
-    |Burmese  |1223.794847   |1.00    |1.00  |1.00|
-    |Tibetan  |1158.023875   |1.00    |1.00  |1.00|
-    |Uyghur  |1106.284894   |1.00    |1.00  |1.00|
-    |Bengali  |1101.598435   |1.00    |1.00  |1.00|
-    |Greek  |1088.558152   |1.00    |1.00  |1.00|
-    |Khmer  |1055.261601   |1.00    |1.00  |1.00|
-    |Armenian  | 941.679072   |1.00    |1.00  |1.00|
-    |Korean  | 919.747124   |1.00    |1.00  |1.00|  
+     "th", "tl", "tr", "ug", "uk", "ur", "uz", "vi", "zh-cn", "zh-tw"]` 
     
-    
-    | worst 10 | avg. score | precision | recall | f1 |
-    |---------:|-----------:|----------:|-------:|---:|
-    |Indonesian |8.933    |0.667    |0.040    |0.075|
-    |Tagalog    |19.005   |0.400    |0.080    |0.133|
-    |Norwegian Bokmal     |12.547   |0.381    |0.640    |0.478|
-    |Danish     |13.471   |0.458    |0.540    |0.495|
-    |Norwegian Nynorsk    |15.516   |0.733    |0.440    |0.550|
-    |Malay      |11.190   |0.458    |0.980    |0.624|
-    |Filipino   |16.709   |0.506    |0.880    |0.642|
-    |Italian    |11.146   |0.548    |0.920    |0.687|
-    |German     |19.375   |0.719    |0.820    |0.766|
-    |Slovak     |72.622   |0.830    |0.780    |0.804|  
-    
-    
-    |      | avg. score | precision | recall | f1 |
-    |-----:|-----------:|----------:|-------:|---:|
-    |top  5| 1279.171|    1.000|    1.000|    1.000|
-    |top 15| 1045.956|    1.000|    1.000|    1.000|
-    |top 25|  954.115|    0.998|    0.983|    0.990|
-    |top 35|  797.532|    0.981|    0.967|    0.973|
-    |top 45|  647.085|    0.968|    0.949|    0.957|
-    |top 55|  540.608|    0.950|    0.925|    0.936|
-    |   all|  460.522|    0.891|    0.877|    0.873|  
-    
-    
-
-* Train log:
-    ![Train log](./docs/css/images/train_log.svg)
-     
-* Character embeddings:
-    ![Character embeddings](./docs/css/images/embeddings.svg)
-
-* Score distribution:
-    ![Score distribution](./docs/css/images/score_distribution.svg)
-
-* False-positives distribution:
-    ![False-positives distribution](./docs/css/images/fp_distribution.svg)
-
-* Model structure:
-    ![Model structure](./docs/css/images/graph.png)
