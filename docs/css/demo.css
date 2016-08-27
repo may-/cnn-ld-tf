@@ -1,0 +1,31 @@
+.clearfix{
+    clear: both;
+}
+
+.page-body{
+    margin-top: 100px;
+}
+
+.wrapper{
+    margin-top: 50px;
+}
+
+.element{
+    margin-top: 20px;
+}
+
+.note{
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #efefef;
+}
+
+.code{
+    background-color: #efefef;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.align-right{
+    text-align: right;
+}
