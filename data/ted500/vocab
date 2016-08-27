@@ -7054,6 +7054,10 @@ sV\u7231
 I2549
 sV\u73b0
 I1294
+sS'tokenize_level'
+p7
+S'char'
+p8
 sV\u30b2
 I2550
 sV\u0937
@@ -7089,7 +7093,7 @@ I1599
 sV\u63d0
 I2281
 sV<ws>
-p7
+p9
 I2
 sV\u05d4
 I158
