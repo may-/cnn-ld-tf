@@ -112,13 +112,13 @@ def load_transcriptions(data_dir):
 
 def main():
     limit = 500
-    data_dir = os.path.join(os.getcwd(), 'data', 'ted%d' % limit)
+    data_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data', 'ted%d' % limit)
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
 
     load_transcriptions(data_dir)
 
-    #language_codes = pd.read_csv(os.path.join(os.getcwd(), 'language_codes.csv'), sep='\t',
+    #language_codes = pd.read_csv(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'language_codes.csv'), sep='\t',
     #                          skip_blank_lines=True, comment='#', header=None, names=['code', 'language'])
     #languages = language_codes.keys()
 

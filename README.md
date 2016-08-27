@@ -1,14 +1,31 @@
 # Convolutional Neural Network for Language Detection
 
-**Note:**  
-This is mostly based on https://github.com/yuhaozhang/sentence-convnet
+**Note:** This is mostly based on https://github.com/yuhaozhang/sentence-convnet
 
+---
+
+## Demo
+
+1. Run API Server
+
+    ```sh
+    python ./main.py
+    ```
+
+2. Run HTML server  
+    for example:
+    ```
+    python -m SimpleHTTPServer 5050
+    ```
+    Access to http://localhost:5050/docs/
+    
 ---
 
 
 ## Requirements
 
-- [Tensorflow](https://www.tensorflow.org/)
+- [Python 2.7](https://www.python.org/)
+- [Tensorflow](https://www.tensorflow.org/) (tested with version 0.10.0rc0)
 - [Numpy](http://www.numpy.org/)
 
 To download TED corpus
@@ -20,14 +37,30 @@ Web API
 
 - [Flask](http://flask.pocoo.org/)
 
+
+## Data
+
++ Language detection  
+    `./data/ted500` directory includes preprocessed data.
+    If you want to download original data, please run the script:
+    ```sh
+    python ./ted.py
+    ```
+    You will need 2GB+ disk space.
+
++ Sentiment analysis  
+    `./data/mr` directory includes 
+
++ Pretrained word embeddings  
+    To use the pretrained word2vec embeddings, download the Google News 
+    pretrained vector data from [this Google Drive link](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit), 
+    and unzip it to the `./data/word2vec` directory. It will be a `.bin file.
+
+
+**Attention:** Data file encoding must be utf-8.
+
 ## Preprocess
 
-Download TED Corpus
-```sh
-python ./ted.py
-```
-
-Prepare train/test Data  
 ```sh
 python ./util.py
 ```
@@ -40,17 +73,14 @@ python ./train.py
 
 ## Prediction
 
-```python
-import predict
-
-result = predict.predict(u'日本語のテスト')
-print result['prediction']
+```sh
+python ./predict.py
 ```
 
 ## Evaluation
 
 ```sh
-python ./eval.py --train_dir=./model/ted500
+python ./eval.py
 ```
 
 ## Run TensorBoard
@@ -59,36 +89,6 @@ python ./eval.py --train_dir=./model/ted500
 tensorboard --logdir=./model/ted500/summaries
 ```
 
-## Use as Web API
-
-### Run API Server
-
-```sh
-python ./main.py
-```
-
-### Request
-
-```
-http://localhost:5000/predict?text="日本語のテスト"
-```
-
-### Response
-
-```
-{
-  "prediction": "ja", 
-  "scores": {
-    "en": -1344.27,
-    "fr": -1003.39,  
-    "de": -788.429, 
-    "ja": 1795.52,
-        .
-        .
-        .
-  }
-}
-```
 
 ## References
 
@@ -113,36 +113,14 @@ Web API on heroku:
 
 
 ## Pre-trained model
-
-* Corpus domain: speech transcriptions
-* Number of train examples: 29250 (450 per language)
-* Number of dev examples: 3250 (50 per language)
-* Parameters:
-    + `data_dir = './data/ted500'`
-    + `train_dir = './model/ted500'`
-    + `batch_size = 100`
-    + `emb_size = 300`
-    + `num_kernel = 100`
-    + `min_window = 3`
-    + `max_window = 5`
-    + `vocab_size = 4090`
-    + `num_classes = 65`
-    + `sent_len = 259`
-    + `l2_reg = 0.0`
-    + `optimizer = 'adam'`
-    + `init_lr = 0.01`
-    + `lr_decay = 0.95`
-    + `tolerance_step = 500`
-    + `dropout = 0.5`
-    + `log_step = 10`
-    + `summary_step = 200`
-    + `save_epoch = 5`
      
-* Supported languages (65):
+* Supported languages (65):  
    `["ar", "az", "bg", "bn", "bo", "cs", "da", "de", "el", "en", "es",
      "fa", "fi", "fil", "fr", "gu", "he", "hi", "ht", "hu", "hy", "id",
      "is", "it", "ja", "ka", "km", "kn", "ko", "ku", "lt", "mg", "ml",
      "mn", "ms", "my", "nb", "ne", "nl", "nn", "pl", "ps", "pt", "ro",
      "ru", "si", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "tg",
      "th", "tl", "tr", "ug", "uk", "ur", "uz", "vi", "zh-cn", "zh-tw"]` 
+ 
+Details: please visit [documentation](https://may-.github.io/cnn-ld-tf/stats.hrml)
     

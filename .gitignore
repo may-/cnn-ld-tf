@@ -1,1 +1,8 @@
-# Created by .ignore support plugin (hsz.mobi)
+.idea/
+.DS_Store
+*.pyc
+.ipynb_checkpoints
+
+train/
+data/word2vec
+

@@ -10,9 +10,10 @@ import cnn
 import util
 
 FLAGS = tf.app.flags.FLAGS
+this_dir = os.path.abspath(os.path.dirname(__file__))
 
-tf.app.flags.DEFINE_string('data_dir', os.path.join(os.getcwd(), 'data', 'ted500'), 'Directory of the data')
-tf.app.flags.DEFINE_string('train_dir', os.path.join(os.getcwd(), 'model', 'ted500'), 'Where to read model')
+tf.app.flags.DEFINE_string('data_dir', os.path.join(this_dir, 'data', 'ted500'), 'Directory of the data')
+tf.app.flags.DEFINE_string('train_dir', os.path.join(this_dir, 'model', 'ted500'), 'Where to read model')
 tf.app.flags.DEFINE_boolean('train_data', False, 'To evaluate on training data')
 
 def evaluate():
@@ -24,9 +25,9 @@ def evaluate():
 
         # read test files
         if FLAGS.train_data:
-            loader = util.DataLoader(os.path.join(FLAGS.data_dir, 'train.cPickle'), batch_size=FLAGS.batch_size)
+            loader = util.DataLoader(FLAGS.data_dir, 'train.cPickle', batch_size=FLAGS.batch_size)
         else:
-            loader = util.DataLoader(os.path.join(FLAGS.data_dir, 'test.cPickle'), batch_size=FLAGS.batch_size)
+            loader = util.DataLoader(FLAGS.data_dir, 'test.cPickle', batch_size=FLAGS.batch_size)
         print 'Start evaluation, %d batches needed, with %d examples per batch.' % (loader.num_batch, FLAGS.batch_size)
 
         true_count = 0
@@ -40,16 +41,13 @@ def evaluate():
             else:
                 raise IOError("Loading checkpoint file failed!")
 
-            num_iter = loader.num_batch
-            if loader._num_examples % loader.num_batch != 0:
-                num_iter += 1
 
-            for _ in xrange(num_iter):
-                batch_x, batch_y = loader.next_batch(loop=False)
+            for _ in xrange(loader.num_batch):
+                x_batch, y_batch = loader.next_batch()
                 scores, loss_value, true_count_value = sess.run([m.scores, m.total_loss, m.true_count_op],
-                                                        feed_dict={m.inputs: batch_x, m.labels: batch_y})
+                                                        feed_dict={m.inputs: x_batch, m.labels: y_batch})
 
-                predictions.extend(np.argmax(scores, axis=1))
+                predictions.extend(scores)
                 true_count += true_count_value
                 avg_loss += loss_value
 
