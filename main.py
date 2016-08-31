@@ -1,20 +1,13 @@
 # -*- coding: utf-8 -*-
 
 
-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 import flask
 import predict
-import active_learning
 import util
 
 import json
 import os
-import time
 
-import numpy as np
 
 app = flask.Flask(__name__)
 app.debug = True
@@ -23,18 +16,20 @@ app.debug = True
 @app.route('/predict', methods=['GET'])
 def main():
     this_dir = os.path.abspath(os.path.dirname(__file__))
+    data_dir = os.path.join(this_dir, 'data', 'ted500')
+    restore_params = util.load_from_dump(os.path.join(data_dir, 'preprocess.cPickle'))
     text = flask.request.args.get('text')
     config = {
-        'data_dir': os.path.join(this_dir, 'data', 'ted500'),
+        'data_dir': data_dir,
         'train_dir': os.path.join(this_dir, 'model', 'ted500'),
         'emb_size': 300,
         'batch_size': 100,
         'num_kernel': 100,
         'min_window': 3,
         'max_window': 5,
-        'vocab_size': 4090,
-        'num_classes': 65,
-        'sent_len': 259,
+        'vocab_size': restore_params['vocab_size'],
+        'num_classes': len(restore_params['class_names']),
+        'sent_len': restore_params['max_sent_len'],
         'l2_reg': 0.0
     }
     res = {}
