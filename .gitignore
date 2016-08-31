@@ -5,13 +5,4 @@
 
 train/
 
-mr500/mr_tok.neg
-mr500/mr_tok.pos
-mr500/review_polarity/
-rel300/classes
-rel300/emb.npy
-rel300/raw.cPickle
-rel300/religion.zip
-rel300/test.cPickle
-rel300/train.cPickle
-rel300/vocab
+data/ted500/ted_500.*

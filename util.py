@@ -25,6 +25,10 @@ UNLABELED_SUFFIX = 'unl'
 _WORD_SPLIT = re.compile(b"([.,!?\"':;)(])")
 
 
+
+THIS_DIR = os.path.abspath(os.path.dirname(__file__))
+
+
 class TextReader(object):
 
     def __init__(self, data_dir, class_names):
@@ -80,10 +84,6 @@ class TextReader(object):
         self.word2id = dict()
         self.max_sent_len = max_sent_len
         vocab_file = os.path.join(self.data_dir, 'vocab.cPickle')
-        #with open(vocab_file, 'w') as outfile:
-        #    for idx, w in enumerate(word_list):
-        #        self.word2id[w] = idx
-        #        outfile.write(w + '\t' + str(idx) + '\n')
         for idx, w in enumerate(word_list):
             self.word2id[w] = idx
         dump_to_file(vocab_file, self.word2id)
@@ -376,9 +376,7 @@ class VocabLoader(object):
         return toks_ids
 
 def clean_str(string):
-    """
-    Tokenization/string cleaning.
-    """
+    """Tokenization/string cleaning. """
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
     string = re.sub(r"\'s", " \'s", string)
     string = re.sub(r"\'ve", " \'ve", string)
@@ -478,7 +476,7 @@ def prepare_pretrained_embedding(fname, word2id):
 
 def load_language_codes():
     ret = {}
-    path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'language_codes.csv')
+    path = os.path.join(THIS_DIR, 'language_codes.csv')
     with codecs_open(path, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             if not line.startswith('#') and len(line.strip()) > 0:
@@ -488,46 +486,15 @@ def load_language_codes():
     return ret
 
 def main():
-    this_dir = os.path.abspath(os.path.dirname(__file__))
-    # language detection
-    #data_dir = os.path.join(this_dir, 'data', 'ted500')
-    #class_names = ["ar", "az", "bg", "bn", "bo", "cs", "da", "de", "el", "en", "es",
-    #               "fa", "fi", "fil", "fr", "gu", "he", "hi", "ht", "hu", "hy", "id",
-    #               "is", "it", "ja", "ka", "km", "kn", "ko", "ku", "lt", "mg", "ml",
-    #               "mn", "ms", "my", "nb", "ne", "nl", "nn", "pl", "ps", "pt", "ro",
-    #               "ru", "si", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "tg",
-    #               "th", "tl", "tr", "ug", "uk", "ur", "uz", "vi", "zh-cn", "zh-tw"]
-    #reader = TextReader(data_dir, class_names=class_names)
-    #reader.prepare_data(vocab_size=4090, test_size=50, tokenize_level='char')
-
-    # movie review sentiment analysis
-    #data_dir = os.path.join(this_dir, 'data', 'mr500')
-    #reader = TextReader(data_dir, class_names=["neg", "pos"])
-    #reader.prepare_data(vocab_size=29000, test_size=50, tokenize_level=None)
-    #embedding_path = os.path.join(this_dir, 'data', 'word2vec', 'GoogleNews-vectors-negative300.bin')
-    #embedding = prepare_pretrained_embedding(embedding_path, reader.word2id)
-    #np.save(os.path.join(data_dir, 'emb.npy'), embedding)
-
-    # twitter sarc/notsarc dataset
-    #data_dir = os.path.join(this_dir, 'data', 'tw700')
-    #reader = TextReader(data_dir, class_names=["sarc", "notsarc"])
-    #reader.prepare_data(vocab_size=8100, test_size=70, tokenize_level=None, shuffle=False)
-    #embedding_path = os.path.join(this_dir, 'data', 'word2vec', 'GoogleNews-vectors-negative300.bin')
-    #embedding = prepare_pretrained_embedding(embedding_path, reader.word2id)
-    #np.save(os.path.join(data_dir, 'emb.npy'), embedding)
-
-    # tuba causal dataset
-    data_dir = os.path.join(this_dir, 'data', 'tuba900')
-    reader = TextReader(data_dir, class_names=['causal', 'enable', 'none'])
-    reader.prepare_data(vocab_size=17000, test_size=90, tokenize_level=None, shuffle=True)
-
-    # religion belief/nonbelief dataset
-    #data_dir = os.path.join(this_dir, 'data', 'rel300')
-    #reader = TextReader(data_dir, class_names=["belief", "nonbeleif"])
-    #reader.prepare_data(vocab_size=5000, test_size=100, tokenize_level=None, shuffle=False)
-    #embedding_path = os.path.join(this_dir, 'data', 'word2vec', 'GoogleNews-vectors-negative300.bin')
-    #embedding = prepare_pretrained_embedding(embedding_path, reader.word2id)
-    #np.save(os.path.join(data_dir, 'emb.npy'), embedding)
+    data_dir = os.path.join(THIS_DIR, 'data', 'ted500')
+    class_names = ["ar", "az", "bg", "bn", "bo", "cs", "da", "de", "el", "en", "es",
+                   "fa", "fi", "fil", "fr", "gu", "he", "hi", "ht", "hu", "hy", "id",
+                   "is", "it", "ja", "ka", "km", "kn", "ko", "ku", "lt", "mg", "ml",
+                   "mn", "ms", "my", "nb", "ne", "nl", "nn", "pl", "ps", "pt", "ro",
+                   "ru", "si", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "tg",
+                   "th", "tl", "tr", "ug", "uk", "ur", "uz", "vi", "zh-cn", "zh-tw"]
+    reader = TextReader(data_dir, class_names=class_names)
+    reader.prepare_data(vocab_size=4090, test_size=50, tokenize_level='char')
 
 
 if __name__ == '__main__':
