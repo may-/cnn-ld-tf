@@ -3,18 +3,26 @@
 import sys
 import os
 import re
-import random
+from random import randint
 from codecs import open as codecs_open
 from collections import Counter, defaultdict
 import cPickle as pickle
 import numpy as np
+import scipy.stats
 
 
-UNK_TOKEN = '<unk>'
-PAD_TOKEN = '<pad>'
+UNK_TOKEN = '<unk>' # unknown word
+PAD_TOKEN = '<pad>' # pad symbol
+WS_TOKEN = '<ws>'   # white space (for character embeddings)
+BOS_TOKEN = '<s>'   # begin of sentence
+EOS_TOKEN = '</s>'  # end of sentence
+
 RANDOM_SEED = 1234
 
 UNLABELED_SUFFIX = 'unl'
+
+# Regular expressions used to tokenize.
+_WORD_SPLIT = re.compile(b"([.,!?\"':;)(])")
 
 
 class TextReader(object):
@@ -30,8 +38,6 @@ class TextReader(object):
         if not os.path.exists(self.data_dir):
             sys.exit('Data directory does not exist.')
         self.set_filenames()
-        class_file = os.path.join(self.data_dir, 'classes')
-        dump_to_file(class_file, self.class_names)
 
     def set_filenames(self):
         data_files = {}
@@ -45,7 +51,7 @@ class TextReader(object):
         assert data_files
         self.data_files = data_files
 
-    def prepare_dict(self, vocab_size=10000, tokenize_level='word'):
+    def prepare_dict(self, vocab_size=10000, tokenize_level=None):
         max_sent_len = 0
         c = Counter()
         # store the preprocessed raw text to avoid cleaning it again
@@ -55,15 +61,16 @@ class TextReader(object):
             with codecs_open(f, 'r', encoding='utf-8') as infile:
                 for line in infile:
                     if tokenize_level == 'char':
-                        clean_string = tokenize_char(line)
+                        toks = char_tokenizer(line)
+                    elif tokenize_level == 'word':
+                        toks = word_tokenizer(line.strip())
                     else:
-                        clean_string = tokenize_word(line)
-                    toks = clean_string.split()
+                        toks = line.strip().lower().split()
                     if len(toks) > max_sent_len:
                         max_sent_len = len(toks)
                     for t in toks:
                         c[t] += 1
-                    self.tok_text[label].append(clean_string)
+                    self.tok_text[label].append(' '.join(toks))
         total_words = len(c)
         assert total_words >= vocab_size
         word_list = [p[0] for p in c.most_common(vocab_size - 2)]
@@ -71,49 +78,38 @@ class TextReader(object):
         word_list.insert(0, UNK_TOKEN)
         self.word2freq = c
         self.word2id = dict()
-        vocab_file = os.path.join(self.data_dir, 'vocab')
+        self.max_sent_len = max_sent_len
+        vocab_file = os.path.join(self.data_dir, 'vocab.cPickle')
         #with open(vocab_file, 'w') as outfile:
         #    for idx, w in enumerate(word_list):
         #        self.word2id[w] = idx
         #        outfile.write(w + '\t' + str(idx) + '\n')
         for idx, w in enumerate(word_list):
             self.word2id[w] = idx
-        self.word2id['max_sent_len'] = max_sent_len
-        self.word2id['tokenize_level'] = tokenize_level
         dump_to_file(vocab_file, self.word2id)
-        del self.word2id['max_sent_len']
-        del self.word2id['tokenize_level']
-        print '%d words found in training set. Truncate to vocabulary size %d.' % (total_words, vocab_size)
+        print '%d words found in training set. Truncated to vocabulary size %d.' % (total_words, vocab_size)
         print 'Dictionary saved to file %s. Max sentence length in data is %d.' % (vocab_file, max_sent_len)
-        return max_sent_len
+        return
 
-    def generate_id_data(self, max_sent_len=100):
-        self.max_sent_len = max_sent_len
-        #sentence_and_label_pairs = []
+
+    def generate_id_data(self):
         self.id_text = defaultdict(list)
         for label, sequences in self.tok_text.iteritems():
-            #label_id = [0] * self.num_classes
-            #label_id[self.class_names.index(label)] = 1
             for seq in sequences:
                 toks = seq.split()
                 toks_len = len(toks)
-                if toks_len <= max_sent_len:
-                    pad_left = (max_sent_len - toks_len) / 2
-                    pad_right = int(np.ceil((max_sent_len - toks_len) / 2.0))
+                if toks_len <= self.max_sent_len:
+                    pad_left = (self.max_sent_len - toks_len) / 2
+                    pad_right = int(np.ceil((self.max_sent_len - toks_len) / 2.0))
                 else:
                     continue
                 toks_ids = [1 for _ in xrange(pad_left)] \
                            + [self.word2id[t] if t in self.word2id else 0 for t in toks] \
                            + [1 for _ in xrange(pad_right)]
                 self.id_text[label].append(toks_ids)
-                #sentence_and_label_pairs.append((toks_ids, label_id))
-        #return sentence_and_label_pairs
         return
 
-    def shuffle_and_split(self, test_fraction=0.1):
-        #random.seed(RANDOM_SEED)
-        #random.shuffle(sentence_and_label_pairs)
-        #sentences, labels = zip(*sentence_and_label_pairs)
+    def shuffle_and_split(self, test_size=50, shuffle=True):
         train_x = []
         train_y = []
         test_x = []
@@ -121,61 +117,61 @@ class TextReader(object):
         raw_x = []
         for label, sequences in self.id_text.iteritems():
             length = len(sequences)
-            np.random.seed(RANDOM_SEED)
-            permutation = np.random.permutation(length)
-            raw_seq = self.tok_text[label]
-            #random.shuffle(sequences)
-            shuffled_id = [sequences[i] for i in permutation]
-            shuffled_raw = [raw_seq[i] for i in permutation]
-            test_num = int(length * test_fraction)
-            train_num = length - test_num
             if label == UNLABELED_SUFFIX:
-                test_num = 0
-                train_num = length
+                test_size = 0
+            train_size = length - test_size
+
+            raw_seq = self.tok_text[label]
+
+            if shuffle:
+                np.random.seed(RANDOM_SEED)
+                permutation = np.random.permutation(length)
+                sequences = [sequences[i] for i in permutation]
+                raw_seq = [raw_seq[i] for i in permutation]
 
             label_id = [0] * self.num_classes
             if label != UNLABELED_SUFFIX:
                 label_id[self.class_names.index(label)] = 1
 
-            #for i, seq in enumerate(shuffled_id):
-            #    if i < test_num:
-            #        test_x.append(seq)
-            #        test_y.append(label_id)
-            #    else:
-            #        train_x.append(seq)
-            #        train_y.append(label_id)
-
-            test_x.extend(shuffled_id[:test_num])
-            test_y.extend([label_id for _ in xrange(test_num)])
-            train_x.extend(shuffled_id[test_num:])
-            train_y.extend([label_id for _ in xrange(train_num)])
-            raw_x.extend(shuffled_raw[test_num:])
+            test_x.extend(sequences[train_size:])
+            test_y.extend([label_id for _ in xrange(test_size)])
+            train_x.extend(sequences[:train_size])
+            train_y.extend([label_id for _ in xrange(train_size)])
+            raw_x.extend(raw_seq[:train_size])
 
         assert len(train_x) == len(train_y)
         assert len(train_x) == len(raw_x)
         assert len(test_x) == len(test_y)
-        self.num_examples = len(test_y) + len(train_y)
-        self.test_data = (test_x, test_y)
-        self.train_data = (train_x, train_y)
-        dump_to_file(os.path.join(self.data_dir, 'train.cPickle'), self.train_data)
-        dump_to_file(os.path.join(self.data_dir, 'raw.cPickle'), raw_x)
-        dump_to_file(os.path.join(self.data_dir, 'test.cPickle'), self.test_data)
-        print 'Split dataset into train/test set: %d for training, %d for evaluation.' % \
-              (len(train_y), len(test_y))
-        return
 
-    def prepare_data(self, vocab_size=10000, test_fraction=0.1, tokenize_level='word'):
-        max_sent_len = self.prepare_dict(vocab_size, tokenize_level=tokenize_level)
-        self.generate_id_data(max_sent_len)
-        self.shuffle_and_split(test_fraction)
+        dump_to_file(os.path.join(self.data_dir, 'train.cPickle'), (train_x, train_y))
+        dump_to_file(os.path.join(self.data_dir, 'raw.cPickle'), raw_x)
+        dump_to_file(os.path.join(self.data_dir, 'test.cPickle'), (test_x, test_y))
+        print 'Split dataset into train/test set: %d for training, %d for evaluation.' % (len(train_y), len(test_y))
+        return (len(train_y), len(test_y))
+
+    def prepare_data(self, vocab_size=10000, test_size=50, tokenize_level=None, shuffle=True):
+        # test_size <- per class
+        self.prepare_dict(vocab_size, tokenize_level)
+        self.generate_id_data()
+        train_size, test_size = self.shuffle_and_split(test_size, shuffle)
+        # test_size <- total
+        preprocess_log = {
+            'vocab_size': vocab_size,
+            'class_names': self.class_names,
+            'max_sent_len': self.max_sent_len,
+            'tokenize_level': tokenize_level,
+            'test_size': test_size,
+            'train_size': train_size
+        }
+        dump_to_file(os.path.join(self.data_dir, 'preprocess.cPickle'), preprocess_log)
         return
 
 class DataLoader(object):
 
-    def __init__(self, data_dir, filename, batch_size=50, shuffle=True, load_raw=False):
+    def __init__(self, data_dir, filename, batch_size=50, shuffle=True, permutation=None, load_raw=False):
         self._x = None
         self._y = None
-        self.load_and_shuffle(data_dir, filename, shuffle=shuffle, load_raw=load_raw)
+        self.load_and_shuffle(data_dir, filename, shuffle=shuffle, permutation=permutation, load_raw=load_raw)
 
         self._pointer = 0
 
@@ -185,33 +181,32 @@ class DataLoader(object):
         self.sent_len = len(self._x[0])
 
         self.num_classes = len(self._y[0])
-        self.class_names = load_from_dump(os.path.join(data_dir, 'classes'))
+        self.class_names = load_from_dump(os.path.join(data_dir, 'preprocess.cPickle'))['class_names']
         assert len(self.class_names) == self.num_classes
 
         self.agreement = defaultdict(list)
-        self.pool_flag = np.zeros(self._num_examples)
+        self._pool_flag = np.zeros(self._num_examples)
 
         print 'Loaded target classes (length %d).' % len(self.class_names)
         print 'Loaded data with %d examples. %d examples per batch will be used.' % \
               (self._num_examples, self.batch_size)
 
-    def load_and_shuffle(self, data_dir, filename, shuffle=True, load_raw=False):
+    def load_and_shuffle(self, data_dir, filename, shuffle=True, permutation=None, load_raw=False):
         _x, _y = load_from_dump(os.path.join(data_dir, filename))
         assert len(_x) == len(_y)
         length = len(_y)
         if load_raw:
             _raw_x = load_from_dump(os.path.join(data_dir, 'raw.cPickle'))
         if shuffle:
-            np.random.seed(RANDOM_SEED)
-            perm = np.random.permutation(length)
-            _x = [_x[i] for i in perm]
-            _y = [_y[i] for i in perm]
+            if permutation is None:
+                np.random.seed(RANDOM_SEED)
+                permutation = np.random.permutation(length)
+            else:
+                assert len(permutation) == length
+            _x = [_x[i] for i in permutation]
+            _y = [_y[i] for i in permutation]
             if load_raw:
-                _raw_x = [_raw_x[i] for i in perm]
-            #random.seed(RANDOM_SEED)
-            #data = zip(_x, _y)
-            #random.shuffle(data)
-            #_x, _y = zip(*data)
+                _raw_x = [_raw_x[i] for i in permutation]
         self._x = np.array(_x)
         self._y = np.array(_y)
         if load_raw:
@@ -230,40 +225,44 @@ class DataLoader(object):
 
     def reset_pointer(self):
         self._pointer = 0
-        self.pool_flag = np.zeros(self._num_examples)
+        self._pool_flag = np.zeros(self._num_examples)
+
+    def set_pool_flag(self, i):
+        self._pool_flag[i] = 1
+
+    def get_pool_flag(self):
+        return list(np.where(self._pool_flag == 1)[0])
 
     def next_batch_idx_active(self, config):
-        remain_examples = np.where(self.pool_flag == 0)[0]
+        remain_examples = np.where(self._pool_flag == 0)[0]
         #print '%d / %d' % (len(remain_examples), self._num_examples)
 
-        # first batch
-        if self._num_examples == len(remain_examples):
-            idx = range(self.batch_size)
-        # last batch
-        elif self.batch_size > len(remain_examples):
-            idx = remain_examples
+        # first batch (random prediction, because there is no model to predict)
+        if config['global_step'] == 0:
+            idx = range(config['batch_size'])
+            pred = [randint(0, self.num_classes-1) for _ in xrange(config['batch_size'])]
         else:
             pool_idx = remain_examples[:config['pool_size']]
             x_pool = np.vstack(tuple([np.array(self._x[i]) for i in pool_idx]))
 
             # get idx of k-most informative examples
-            active_idx = most_informative(x_pool, config)
+            active_idx, pred = most_informative(x_pool, config)
             idx = [pool_idx[i] for i in active_idx]
 
         # update flag
         for i in idx:
-            self.pool_flag[i] = 1
+            self.set_pool_flag(i)
 
-        return idx
+        return idx, pred
 
-    def get_oracle(self, idx):
+    def get_oracle(self, idx, y_pred):
         y_batch = [self._y[i] for i in idx] # true label
-        _raw_x = [self._x[i] for i in idx]
+        _raw_x = [self._raw_x[i] for i in idx]
 
         _y = []
         for k in xrange(self.batch_size):
             input_class = {l: c for l, c in enumerate(self.class_names)}
-            _raw_y = raw_input('\t%s\n\t%s\n\t' % (_raw_x[k], str(input_class)))
+            _raw_y = raw_input('\t%s\n\t%s\t prediction: %d\n\t' % (_raw_x[k], str(input_class), pred[k]))
             try:
                 _raw_y = int(_raw_y)
                 if int(_raw_y) >= self.num_classes or int(_raw_y) < 0:
@@ -296,28 +295,37 @@ class DataLoader(object):
 
 def most_informative(x_pool, config):
     import predict
-    import scipy.stats
+
 
     #print 'x_pool', x_pool.shape
     result = predict.predict(x_pool, config, raw_text=False)
 
-    strategy = config['strategy']
-    if strategy == 'max_entropy':
-        prob = [scipy.stats.entropy(res) for res in result['scores']]
-        idx = np.argsort(prob)
-        idx = list(idx)[-1 * config['batch_size']:] # take last-k examples
 
-    elif strategy == 'least_confident':
-        prob = np.argmax(result['scores'], axis=1)
-        idx = np.argsort(prob)
-        idx = list(idx)[:config['batch_size']] # take first-k examples
+    # last batch
+    if config['batch_size'] >= x_pool.shape[0]:
+        idx = range(x_pool.shape[0])
 
-    elif strategy == 'min_margin':
-        prob = [s[-1] - s[-2] for s in np.sort(result['scores'], axis=1)]
-        idx = np.argsort(prob)
-        idx = list(idx)[:config['batch_size']] # take first-k examples
+    else:
 
-    return idx
+        strategy = config['strategy']
+        if strategy == 'max_entropy':
+            prob = [scipy.stats.entropy(res) for res in result['scores']]
+            idx = np.argsort(prob)
+            idx = list(idx)[-1 * config['batch_size']:] # take last-k examples
+
+        elif strategy == 'least_confident':
+            prob = np.argmax(result['scores'], axis=1)
+            idx = np.argsort(prob)
+            idx = list(idx)[:config['batch_size']] # take first-k examples
+
+        elif strategy == 'min_margin':
+            prob = [s[-1] - s[-2] for s in np.sort(result['scores'], axis=1)]
+            idx = np.argsort(prob)
+            idx = list(idx)[:config['batch_size']] # take first-k examples
+
+    # prediction
+    pred = [result['prediction'][i] for i in idx]
+    return idx, pred
 
 class VocabLoader(object):
 
@@ -325,21 +333,19 @@ class VocabLoader(object):
         self.word2id = None
         self.max_sent_len = None
         self.class_names = None
-        self.tokenize_level = 'word'
+        self.tokenize_level = None
         self.restore(data_dir)
 
     def restore(self, data_dir):
-        class_file = os.path.join(data_dir, 'classes')
-        self.class_names = load_from_dump(class_file)
+        class_file = os.path.join(data_dir, 'preprocess.cPickle')
+        restore_params = load_from_dump(class_file)
+        self.class_names = restore_params['class_names']
+        self.max_sent_len = restore_params['max_sent_len']
+        self.tokenize_level = restore_params['tokenize_level']
         print 'Loaded target classes (length %d).' % len(self.class_names)
 
-        vocab_file = os.path.join(data_dir, 'vocab')
-        tmp = load_from_dump(vocab_file)
-        self.max_sent_len = tmp['max_sent_len']
-        self.tokenize_level = tmp['tokenize_level']
-        del tmp['max_sent_len']
-        del tmp['tokenize_level']
-        self.word2id = tmp
+        vocab_file = os.path.join(data_dir, 'vocab.cPickle')
+        self.word2id = load_from_dump(vocab_file)
         print 'Loaded vocabulary (size %d).' % len(self.word2id)
 
     def text2id(self, raw_text):
@@ -353,9 +359,11 @@ class VocabLoader(object):
         max_sent_len = self.max_sent_len
 
         if self.tokenize_level == 'char':
-            toks = tokenize_char(raw_text).split()
+            toks = char_tokenizer(raw_text)
+        elif self.tokenize_level == 'word':
+            toks = word_tokenizer(raw_text.strip())
         else:
-            toks = tokenize_word(raw_text).split()
+            toks = raw_text.strip().lower().split()
         toks_len = len(toks)
         if toks_len <= max_sent_len:
             pad_left = (max_sent_len - toks_len) / 2
@@ -367,7 +375,7 @@ class VocabLoader(object):
                    [1 for _ in xrange(pad_right)]
         return toks_ids
 
-def tokenize_word(string):
+def clean_str(string):
     """
     Tokenization/string cleaning.
     """
@@ -386,6 +394,13 @@ def tokenize_word(string):
     string = re.sub(r"\s{2,}", " ", string)
     return string.strip().lower()
 
+def word_tokenizer(sentence):
+    """Very basic tokenizer: split the sentence into a list of tokens."""
+    words = []
+    for space_separated_fragment in sentence.strip().split():
+        words.extend(re.split(_WORD_SPLIT, space_separated_fragment))
+    return [w for w in words if w]
+
 def sanitize_char(text):
     text = re.sub(ur'<.*?>', '', text)              # html tags in subtitles
     text = re.sub(ur'[0-9]', '', text)              # numbers
@@ -394,14 +409,22 @@ def sanitize_char(text):
     text = re.sub(ur' {2,}', ' ', text)             # more than two consective spaces
     return text.strip().lower()
 
-def tokenize_char(text, bos=True, eos=True, ws_symbol=u'<ws>', bos_symbol=u'<s>', eos_symbol=u'</s>'):
-    text = list(sanitize_char(text))
-    text = ' '.join([x.replace(' ', ws_symbol) for x in text])
+def char_tokenizer(text, bos=True, eos=True):
+    seq = list(sanitize_char(text))
+    seq = [x.replace(' ', WS_TOKEN) for x in seq]
     if bos:
-        text = bos_symbol + ' ' + text
+        seq.insert(0, BOS_TOKEN)
     if eos:
-        text = text + ' ' + eos_symbol
-    return text
+        seq.append(EOS_TOKEN)
+
+    #text = list(sanitize_char(text))
+    #text = ' '.join([x.replace(' ', WS_TOKEN) for x in text])
+    #if bos:
+    #    text = BOS_TOKEN + ' ' + text
+    #if eos:
+    #    text = text + ' ' + EOS_TOKEN
+
+    return seq
 
 def dump_to_file(filename, obj):
     with open(filename, 'wb') as outfile:
@@ -465,8 +488,9 @@ def load_language_codes():
     return ret
 
 def main():
+    this_dir = os.path.abspath(os.path.dirname(__file__))
     # language detection
-    #data_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data', 'ted500')
+    #data_dir = os.path.join(this_dir, 'data', 'ted500')
     #class_names = ["ar", "az", "bg", "bn", "bo", "cs", "da", "de", "el", "en", "es",
     #               "fa", "fi", "fil", "fr", "gu", "he", "hi", "ht", "hu", "hy", "id",
     #               "is", "it", "ja", "ka", "km", "kn", "ko", "ku", "lt", "mg", "ml",
@@ -474,15 +498,36 @@ def main():
     #               "ru", "si", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "tg",
     #               "th", "tl", "tr", "ug", "uk", "ur", "uz", "vi", "zh-cn", "zh-tw"]
     #reader = TextReader(data_dir, class_names=class_names)
-    #reader.prepare_data(vocab_size=4090, test_fraction=0.1, tokenize_level='char')
+    #reader.prepare_data(vocab_size=4090, test_size=50, tokenize_level='char')
 
-    # sentiment analysis
-    data_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data', 'mr')
-    class_names = ["neg", "pos"]
-    reader = TextReader(data_dir, class_names=class_names)
-    reader.prepare_data(vocab_size=15000, test_fraction=0.1, tokenize_level='word')
-    embedding = prepare_pretrained_embedding('./data/word2vec/GoogleNews-vectors-negative300.bin', reader.word2id)
-    np.save(os.path.join(data_dir, 'emb.npy'), embedding)
+    # movie review sentiment analysis
+    #data_dir = os.path.join(this_dir, 'data', 'mr500')
+    #reader = TextReader(data_dir, class_names=["neg", "pos"])
+    #reader.prepare_data(vocab_size=29000, test_size=50, tokenize_level=None)
+    #embedding_path = os.path.join(this_dir, 'data', 'word2vec', 'GoogleNews-vectors-negative300.bin')
+    #embedding = prepare_pretrained_embedding(embedding_path, reader.word2id)
+    #np.save(os.path.join(data_dir, 'emb.npy'), embedding)
+
+    # twitter sarc/notsarc dataset
+    #data_dir = os.path.join(this_dir, 'data', 'tw700')
+    #reader = TextReader(data_dir, class_names=["sarc", "notsarc"])
+    #reader.prepare_data(vocab_size=8100, test_size=70, tokenize_level=None, shuffle=False)
+    #embedding_path = os.path.join(this_dir, 'data', 'word2vec', 'GoogleNews-vectors-negative300.bin')
+    #embedding = prepare_pretrained_embedding(embedding_path, reader.word2id)
+    #np.save(os.path.join(data_dir, 'emb.npy'), embedding)
+
+    # tuba causal dataset
+    data_dir = os.path.join(this_dir, 'data', 'tuba900')
+    reader = TextReader(data_dir, class_names=['causal', 'enable', 'none'])
+    reader.prepare_data(vocab_size=17000, test_size=90, tokenize_level=None, shuffle=True)
+
+    # religion belief/nonbelief dataset
+    #data_dir = os.path.join(this_dir, 'data', 'rel300')
+    #reader = TextReader(data_dir, class_names=["belief", "nonbeleif"])
+    #reader.prepare_data(vocab_size=5000, test_size=100, tokenize_level=None, shuffle=False)
+    #embedding_path = os.path.join(this_dir, 'data', 'word2vec', 'GoogleNews-vectors-negative300.bin')
+    #embedding = prepare_pretrained_embedding(embedding_path, reader.word2id)
+    #np.save(os.path.join(data_dir, 'emb.npy'), embedding)
 
 
 if __name__ == '__main__':

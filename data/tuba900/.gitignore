@@ -1,0 +1,5 @@
+classes
+eval
+vocab
+emb.npy
+*.cPickle

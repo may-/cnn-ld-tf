@@ -1,6 +1,6 @@
 # Convolutional Neural Network for Language Detection
 
-**Note:** This is mostly based on https://github.com/yuhaozhang/sentence-convnet
+**Note:** This project is mostly based on https://github.com/yuhaozhang/sentence-convnet
 
 ---
 
@@ -17,7 +17,7 @@
     ```
     python -m SimpleHTTPServer 5050
     ```
-    Access to http://localhost:5050/docs/
+    Access to [http://localhost:5050/docs/](http://localhost:5050/docs/)
     
 ---
 
@@ -39,25 +39,29 @@ Web API
 
 
 ## Data
-
-+ Language detection  
++ TED Subtitle Corpus  
     `./data/ted500` directory includes preprocessed data.
-    If you want to download original data, please run the script:
+    To reproduce (2GB+ disk space required):
     ```sh
     python ./ted.py
     ```
-    You will need 2GB+ disk space.
+    
++ Your own data  
+    Put the data file per class, e.g. `class_names = ['neg', 'pos']`:
+    ```
+    cnn-ld-tf
+    ├── ...
+    └── data
+        └── mr
+            ├── mr.neg  # examples with class neg
+            └── mr.pos  # examples with class pos
+    ```    
 
-+ Sentiment analysis  
-    `./data/mr` directory includes 
-
-+ Pretrained word embeddings  
-    To use the pretrained word2vec embeddings, download the Google News 
-    pretrained vector data from [this Google Drive link](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit), 
-    and unzip it to the `./data/word2vec` directory. It will be a `.bin file.
-
-
-**Attention:** Data file encoding must be utf-8.
+    **Note:**
+    
+    + Data file encoding must be utf-8.
+    + One example per line.
+    + The number of examples of each class must be the same.
 
 ## Preprocess
 
@@ -122,5 +126,5 @@ Web API on heroku:
      "ru", "si", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "tg",
      "th", "tl", "tr", "ug", "uk", "ur", "uz", "vi", "zh-cn", "zh-tw"]` 
  
-Details: please visit [documentation](https://may-.github.io/cnn-ld-tf/stats.hrml)
+Details: please visit [documentation](https://may-.github.io/cnn-ld-tf/stat.html)
     

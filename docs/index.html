@@ -22,10 +22,10 @@
 
 </head>
 <body>
-<nav class="navbar navbar-default navbar-inverse navbar-fixed-top">
+<nav class="navbar navbar-default navbar-inverse">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">CNN-LD-TF</a>
+            <a class="navbar-brand" href="https://github.com/may-/cnn-ld-tf">CNN-LD-TF</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -38,8 +38,14 @@
         </div><!--/.nav-collapse -->
     </div>
 </nav>
+<a href="https://github.com/may-/cnn-ld-tf">
+    <img style="position: absolute; top: 0; right: 0; border: 0;"
+         src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
+         alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+</a>
+<div id="page-body">
 <div class="container">
-    <section class="container-fluid page-body">
+    <section class="container-fluid">
         <h2>Demo: Convolutional Neural Network for Language Detection</h2>
         <div class="row wrapper">
             <div class="col-md-6">
@@ -77,31 +83,43 @@
                     </div>
                     -->
                     <div class="row element">
-                        <textarea class="form-control" rows="8" id="get-text" placeholder="Enter text here..." required></textarea>
+                        <textarea class="form-control" rows="8" id="get-text" placeholder="Enter text here..." required>こんにちは</textarea>
                     </div>
                     <div class="row element">
-                        <button type="submit" class="btn btn-default pull-right" id="send-text" href="">Detect Language</button>
+                        <button type="submit" class="btn btn-primary btn-outline pull-right" id="send-text" href="">Detect Language</button>
                     </div>
                 </form>
                 </div>
                 <div class="row">
-                    <h3>Prediction: <span id="prediction"></span></h3>
-                    <h3>Score: <span id="score"></span></h3>
+                    <h3>Prediction: <span id="prediction">Japanese</span></h3>
+                    <h3>Score: <span id="score">652.235</span></h3>
                 </div>
             </div>
             <div class="col-md-6">
                 <div id="chartContainer"></div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6 note">
-                <strong>Note:</strong> Please make sure that the backend server is running properly. To run the server:
-                <div class="panel code">
-                    <span>python ./main.py</span>
-                </div>
-            </div>
-        </div>
+
+
     </section>
 </div>
+</div><!-- end .page-body -->
+
+<div class="footer">
+    <div class="container">
+    <div class="col-md-6 note">
+        <span class="note-label">Note:</span> Please make sure that the backend server is running properly. To run the server:
+        <div class="panel code">
+            <span>git clone https://github.com/may-/cnn-ld-tf.git</span>
+            <span>cd cnn-ld-tf</span>
+            <span>python ./main.py</span>
+        </div>
+    </div>
+    <div class="col-md-6 note">
+        <div>The pretrained model achieved 87% classification accuracy on the validation set.</div>
+        <div> >> <a href="./stat.html">Statistics</a></div>
+    </div>
+    </div>
+</div><!-- end .footer-->
 </body>
 </html>

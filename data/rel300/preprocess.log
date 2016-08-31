@@ -1,0 +1,12 @@
+# python ./prepare.py
+Skipped too short(< 5) or too long(> 1000) sequences.
+Sequence level: text
+Saved 100+300 examples in "./data/rel300/rel.belief".
+Saved 100+300 examples in "./data/rel300/rel.nonbelief".
+
+# python ./util.py
+5070 words found in training set. Truncated to vocabulary size 5000.
+Dictionary saved to file /path/to/cnn-ld-tf/data/rel300/vocab. Max sentence length in data is 963.
+Split dataset into train/test set: 300 for training, 100 for evaluation.
+Reading pretrained word vectors from file ...
+Generated embeddings with shape (5000, 300)

@@ -16,11 +16,11 @@ tf.app.flags.DEFINE_string('data_dir', os.path.join(this_dir, 'data', 'ted500'),
 tf.app.flags.DEFINE_string('train_dir', os.path.join(this_dir, 'model', 'ted500'), 'Where to read model')
 tf.app.flags.DEFINE_boolean('train_data', False, 'To evaluate on training data')
 
-def evaluate():
+def evaluate(config):
     """ Build evaluation graph and run. """
     with tf.Graph().as_default():
         with tf.variable_scope('cnn'):
-            m = cnn.Model(FLAGS, is_train=False)
+            m = cnn.Model(config, is_train=False)
         saver = tf.train.Saver(tf.all_variables())
 
         # read test files
@@ -58,9 +58,16 @@ def evaluate():
             return predictions
 
 def main(argv=None):
-    predictions = evaluate()
+    FLAGS._parse_flags()
+    config = dict(FLAGS.__flags.items())
+    util.dump_to_file(os.path.join(FLAGS.train_dir, 'flags.cPickle'), config)
+    restore_params = util.load_from_dump(os.path.join(FLAGS.data_dir, 'preprocess.cPickle'))
+    config['vocab_size'] = restore_params['vocab_size']
+    config['sent_len'] = restore_params['max_sent_len']
+    config['num_classes'] = len(restore_params['class_names'])
+    predictions = evaluate(config)
     scores = np.vstack(tuple(predictions))
-    util.dump_to_file(os.path.join(FLAGS.data_dir, 'eval'), scores)
+    util.dump_to_file(os.path.join(FLAGS.data_dir, 'eval.cPickle'), scores)
 
 if __name__ == '__main__':
     tf.app.run()

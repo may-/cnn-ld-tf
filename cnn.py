@@ -6,6 +6,7 @@ Mostly based on https://github.com/yuhaozhang/sentence-convnet
 
 import tensorflow as tf
 
+# model parameters
 tf.app.flags.DEFINE_integer('batch_size', 100, 'Training batch size')
 tf.app.flags.DEFINE_integer('emb_size', 300, 'Size of word embeddings')
 tf.app.flags.DEFINE_integer('num_kernel', 100, 'Number of filters for each window size')
@@ -33,18 +34,18 @@ class Model(object):
 
     def __init__(self, config, is_train=True):
         self.is_train = is_train
-        self.emb_size = config.emb_size
-        self.batch_size = config.batch_size
-        self.num_kernel = config.num_kernel
-        self.min_window = config.min_window
-        self.max_window = config.max_window
-        self.vocab_size = config.vocab_size
-        self.num_classes = config.num_classes
-        self.sent_len = config.sent_len
-        self.l2_reg = config.l2_reg
+        self.emb_size = config['emb_size']
+        self.batch_size = config['batch_size']
+        self.num_kernel = config['num_kernel']
+        self.min_window = config['min_window']
+        self.max_window = config['max_window']
+        self.vocab_size = config['vocab_size']
+        self.num_classes = config['num_classes']
+        self.sent_len = config['sent_len']
+        self.l2_reg = config['l2_reg']
         if is_train:
-            self.optimizer = config.optimizer
-            self.dropout = config.dropout
+            self.optimizer = config['optimizer']
+            self.dropout = config['dropout']
         self.build_graph()
 
     def build_graph(self):

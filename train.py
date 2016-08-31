@@ -30,59 +30,66 @@ tf.app.flags.DEFINE_float('dropout', 0.5, 'Dropout rate. 0 is no dropout.')
 tf.app.flags.DEFINE_boolean('active', False, 'Active train mode; passive mode if False')
 tf.app.flags.DEFINE_boolean('interactive', False, 'Interactive mode; wait user annotation in each batch iteration')
 tf.app.flags.DEFINE_integer('pool_size', 1000, 'Number of elements in pool')
-tf.app.flags.DEFINE_string('strategy', 'max_entropy', 'AL Strategy to use. Must be one of "max_entropy", "least_confident", "min_margin"')
+tf.app.flags.DEFINE_string('strategy', 'max_entropy', 'AL Strategy to use. Must be one of "max_entropy", "least_confident" and "min_margin"')
 
 # logging
 tf.app.flags.DEFINE_integer('log_step', 10, 'Display log to stdout after this step')
 tf.app.flags.DEFINE_integer('summary_step', 200, 'Write summary after this step')
-tf.app.flags.DEFINE_integer('checkpoint_step', 200, 'Save model after this epoch')
+tf.app.flags.DEFINE_integer('checkpoint_step', 200, 'Save model after this step')
 
 
 def train():
-    # load data
-    train_loader = util.DataLoader(FLAGS.data_dir, 'train.cPickle', batch_size=FLAGS.batch_size, load_raw=FLAGS.active)
-    dev_loader = util.DataLoader(FLAGS.data_dir, 'test.cPickle', batch_size=FLAGS.batch_size)
-    max_steps = train_loader.num_batch * FLAGS.num_epoch
-    FLAGS.num_classes = train_loader.num_classes
-    FLAGS.sent_len = train_loader.sent_len
-
-    # log & write & save every step
-    if FLAGS.active:
-        FLAGS.log_step = 1
-        FLAGS.summary_step = 1
-        FLAGS.checkpoint_step = 1
-
-
     # train_dir
     timestamp = str(int(time.time()))
     out_dir = os.path.abspath(os.path.join(FLAGS.train_dir, timestamp))
 
+    # save flags
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+    FLAGS._parse_flags()
+    config = dict(FLAGS.__flags.items())
+    util.dump_to_file(os.path.join(out_dir, 'flags.cPickle'), config)
+
+    # load data
+    train_loader = util.DataLoader(FLAGS.data_dir, 'train.cPickle', batch_size=FLAGS.batch_size, load_raw=FLAGS.active)
+    dev_loader = util.DataLoader(FLAGS.data_dir, 'test.cPickle', batch_size=FLAGS.batch_size)
+    max_steps = train_loader.num_batch * FLAGS.num_epoch
+    config['num_classes'] = train_loader.num_classes
+    config['sent_len'] = train_loader.sent_len
+
+
+
     with tf.Graph().as_default():
         with tf.variable_scope('cnn', reuse=None):
-            m = cnn.Model(FLAGS, is_train=True)
+            m = cnn.Model(config, is_train=True)
         with tf.variable_scope('cnn', reuse=True):
-            mtest = cnn.Model(FLAGS, is_train=False)
+            mtest = cnn.Model(config, is_train=False)
 
+        # checkpoint
         saver = tf.train.Saver(tf.all_variables())
         save_path = os.path.join(out_dir, 'model.ckpt')
         summary_op = tf.merge_all_summaries()
 
+        # session
         sess = tf.Session(config=tf.ConfigProto(log_device_placement=FLAGS.log_device_placement))
         #summary_writer = tf.train.SummaryWriter(summary_dir, graph_def=sess.graph_def)
         summary_dir = os.path.join(out_dir, "summaries")
         summary_writer = tf.train.SummaryWriter(summary_dir, graph=sess.graph)
         sess.run(tf.initialize_all_variables())
 
+        # assign pretrained embeddings
         if FLAGS.use_pretrain:
             print "Use pretrained embeddings to initialize model ..."
             pretrained_embedding = np.load(os.path.join(FLAGS.data_dir, 'emb.npy'))
             m.assign_embedding(sess, pretrained_embedding)
 
+        # initialize parameters
         current_lr = FLAGS.init_lr
         lowest_loss_value = float("inf")
-        step_loss_ascend = 0
+        decay_step_counter = 0
         global_step = 0
 
+        # evaluate on dev set
         def dev_step(mtest, sess, data_loader):
             dev_loss = 0.0
             dev_accuracy = 0.0
@@ -97,7 +104,7 @@ def train():
             data_loader.reset_pointer()
             return (dev_loss, dev_accuracy)
 
-        # Note that this is a soft version of epoch.
+        # train loop
         for epoch in range(FLAGS.num_epoch):
             train_loss = []
             train_accuracy = []
@@ -150,25 +157,20 @@ def train():
                     summary_str = sess.run(summary_op)
                     summary_writer.add_summary(summary_str, global_step)
 
-                    # train_log
-
-                    #summary_writer.add_summary(_summary_for_scalar('train/loss', float(loss_value)), global_step=global_step)
-                    #summary_writer.add_summary(_summary_for_scalar('train/accuracy', float(accuracy)), global_step=global_step)
-
                     # summary loss/accuracy
                     train_loss_mean = sum(train_loss) / float(len(train_loss))
                     train_accuracy_mean = sum(train_accuracy) / float(len(train_accuracy) * FLAGS.batch_size)
-                    summary_writer.add_summary(_summary_for_scalar('eval/train_loss', train_loss_mean), global_step=global_step)
-                    summary_writer.add_summary(_summary_for_scalar('eval/train_accuracy', train_accuracy_mean), global_step=global_step)
+                    summary_writer.add_summary(_summary_for_scalar('train/loss', train_loss_mean), global_step=global_step)
+                    summary_writer.add_summary(_summary_for_scalar('train/accuracy', train_accuracy_mean), global_step=global_step)
 
                     dev_loss, dev_accuracy = dev_step(mtest, sess, dev_loader)
                     summary_writer.add_summary(_summary_for_scalar('dev/loss', dev_loss), global_step=global_step)
                     summary_writer.add_summary(_summary_for_scalar('dev/accuracy', dev_accuracy), global_step=global_step)
 
                     print "\nStep %d: train_loss = %.6f, train_accuracy = %.3f" % (global_step, train_loss_mean, train_accuracy_mean)
-                    print "Step %d: dev_loss = %.6f, dev_accuracy = %.3f\n" % (global_step, dev_loss, dev_accuracy)
+                    print "Step %d:   dev_loss = %.6f,   dev_accuracy = %.3f\n" % (global_step, dev_loss, dev_accuracy)
 
-                    if FLAGS.active:
+                    if FLAGS.active and FLAGS.interactive:
                         agreement = {sum([1 for a in v if k[1] == a]): len(v) for k, v in train_loader.agreement.iteritems()}
                         print "Step %d: annotation accuracy = %.3f\n" % \
                               (global_step, sum(agreement.keys())/float(sum(agreement.values())) )
@@ -178,17 +180,18 @@ def train():
                 # decay learning rate if necessary
                 if loss_value < lowest_loss_value:
                     lowest_loss_value = loss_value
-                    step_loss_ascend = 0
+                    decay_step_counter = 0
                 else:
-                    step_loss_ascend += 1
-                if step_loss_ascend >= FLAGS.tolerance_step:
+                    decay_step_counter += 1
+                if decay_step_counter >= FLAGS.tolerance_step:
                     current_lr *= FLAGS.lr_decay
-                    print '%s: step %d/%d (epoch %d/%d), LR decays to %.5f' % \
+                    print '%s: step %d/%d (epoch %d/%d), Learning rate decays to %.5f' % \
                           (datetime.now(), global_step, max_steps, epoch+1, FLAGS.num_epoch, current_lr)
-                    step_loss_ascend = 0
+                    decay_step_counter = 0
 
                 # stop learning if learning rate is too low
-                if current_lr < 1e-5: break
+                if current_lr < 1e-5:
+                    break
 
 
 
@@ -201,11 +204,8 @@ def _summary_for_scalar(name, value):
     return tf.Summary(value=[tf.Summary.Value(tag=name, simple_value=value)])
 
 def main(argv=None):
-    #if tf.gfile.Exists(FLAGS.train_dir):
-    #    tf.gfile.DeleteRecursively(FLAGS.train_dir)
-    #tf.gfile.MakeDirs(FLAGS.train_dir)
-    if not tf.gfile.Exists(FLAGS.train_dir):
-        tf.gfile.MakeDirs(FLAGS.train_dir)
+    if not os.path.exists(FLAGS.train_dir):
+        os.mkdir(FLAGS.train_dir)
     train()
 
 if __name__ == '__main__':

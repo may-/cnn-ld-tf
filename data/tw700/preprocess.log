@@ -1,0 +1,12 @@
+# python ./prepare.py
+Skipped too short(< 3) or too long(> 100) sequences.
+Sequence level: sentence
+Saved 700+70 examples in "./data/tw700/tuba.nonsarc".
+Saved 700+70 examples in "./data/tw700/tuba.sarc".
+
+# python ./util.py
+8110 words found in training set. Truncated to vocabulary size 8100.
+Dictionary saved to file /path/to/cnn-ld-tf/data/tw700/vocab. Max sentence length in data is 166.
+Split dataset into train/test set: 1400 for training, 140 for evaluation.
+Reading pretrained word vectors from file ...
+Generated embeddings with shape (8100, 300)
