@@ -40,6 +40,7 @@ To download TED corpus (`ted.py`)
 To visualize (`visualize.ipynb`)
 
 - [Scikit-learn](http://scikit-learn.org/)
+- [Matplotlib](https://matplotlib.org/)
 
 Web API (`main.py`)
 
