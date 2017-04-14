@@ -100,6 +100,7 @@ python ./eval.py
 ```sh
 tensorboard --logdir=./model/ted500/summaries
 ```
+![Embeddings by script name](./docs/img/tensorboard.png)
 
 
 ## References
