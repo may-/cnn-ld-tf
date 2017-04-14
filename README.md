@@ -30,7 +30,7 @@
 
 To train with pretrained embedding (`train.py --use_pretrain=True`)
 
-- [Gensim]()
+- [Gensim](https://radimrehurek.com/gensim/)
 
 To download TED corpus (`ted.py`)
 
@@ -39,7 +39,7 @@ To download TED corpus (`ted.py`)
 
 To visualize (`visualize.ipynb`)
 
-- [Scikit-learn]()
+- [Scikit-learn](http://scikit-learn.org/)
 
 Web API (`main.py`)
 

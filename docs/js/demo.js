@@ -21,16 +21,16 @@ $(document).ready(function() {
       data: [{
         type: "column",
         dataPoints: [
-          {x: 10, y: 652.235, label: 'Japanese'},
-          {x: 20, y: 58.7071, label: 'Hebrew'},
-          {x: 30, y: 48.0103, label: 'Georgian'},
-          {x: 40, y: 39.0843, label: 'Tibetan'},
-          {x: 50, y: 31.1685, label: 'Vietnamese'},
-          {x: 60, y: -16.8982, label: 'Polish'},
-          {x: 70, y: -41.0487, label: 'Malayalam'},
-          {x: 80, y: -48.6538, label: 'Bengali'},
-          {x: 90, y: -65.5616, label: 'Thai'},
-          {x: 100, y: -77.8349, label: 'Greek'}
+          {x: 10, y: 473.721, label: 'Japanese'},
+          {x: 20, y: 99.5272, label: 'Greek'},
+          {x: 30, y: 76.0632, label: 'Thai'},
+          {x: 40, y: 60.9401, label: 'Urdu'},
+          {x: 50, y: 52.9983, label: 'Sinhalese'},
+          {x: 60, y: 21.5522, label: 'Georgian'},
+          {x: 70, y: 20.3253, label: 'Hebrew'},
+          {x: 80, y: 11.8332, label: 'Nepali'},
+          {x: 90, y: 9.92754, label: 'Mongolian'},
+          {x: 100, y: -1.77319, label: 'Telugu'}
         ]
       }]
     });
