@@ -74,7 +74,6 @@ def load_transcriptions(data_dir):
                 df1 = pd.concat([df1, df2], axis=1)
         df1.to_csv(os.path.join(data_path, 'orig', '%s.csv' % talk_title), sep='\t', encoding='utf-8')
 
-
     if not os.path.exists(os.path.join(data_dir, 'orig')):
         os.mkdir(os.path.join(data_dir, 'orig'))
 
@@ -87,7 +86,7 @@ def load_transcriptions(data_dir):
         orig_path = os.path.join(data_dir, 'orig', '%s.csv' % title)
         if not os.path.exists(orig_path):
             extract_transcriptions(title, data_dir)
-        orig_df = pd.read_csv(f, sep='\t', encoding='utf-8', index_col=0)
+        orig_df = pd.read_csv(orig_path, sep='\t', encoding='utf-8', index_col=0)
         orig_df['sent_id'] = orig_df.index
         orig_df['doc_id'] = pd.Series([doc_id] * len(orig_df), index=orig_df.index)
 
@@ -109,6 +108,7 @@ def load_transcriptions(data_dir):
             filtered.to_csv(path, sep='\t', encoding='utf-8', index=False, header=False)
 
     print('\t\t%d languages extracted.' % len(languages))
+
 
 def main():
     limit = 500
@@ -135,6 +135,7 @@ def main():
         df = pd.read_csv(in_path, sep='\t', encoding='utf-8', header=None, names=['doc_id', 'sent_id', 'x'])
         df = df.iloc[np.random.permutation(len(df))]
         df.x.head(limit).to_csv(out_path, sep='\t', encoding='utf-8', header=None, index=None)
+
 
 if __name__ == '__main__':
     main()

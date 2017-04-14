@@ -8,7 +8,6 @@ import cnn
 import util
 
 
-
 def predict(x, config, raw_text=True):
     """ Build evaluation graph and run. """
     if raw_text:
@@ -20,11 +19,10 @@ def predict(x, config, raw_text=True):
     else:
         x_input = x
 
-
     with tf.Graph().as_default():
         with tf.variable_scope('cnn'):
             m = cnn.Model(config, is_train=False)
-        saver = tf.train.Saver(tf.all_variables())
+        saver = tf.train.Saver(tf.global_variables())
 
         with tf.Session() as sess:
             train_dir = config['train_dir']
@@ -43,36 +41,30 @@ def predict(x, config, raw_text=True):
     else:
         y_pred = np.argmax(scores, axis=1)
 
-
-    ret = {}
+    ret = dict()
     ret['prediction'] = y_pred
     ret['scores'] = scores
     return ret
 
+
 def main(argv=None):
-    text = u"日本語のテスト。"
+    FLAGS = tf.app.flags.FLAGS
     this_dir = os.path.abspath(os.path.dirname(__file__))
-    data_dir = os.path.join(this_dir, 'data', 'ted500')
-    restore_param = util.load_from_dump(os.path.join(data_dir, 'preprocess.cPickle'))
-    config = {
-        'data_dir': data_dir,
-        'train_dir': os.path.join(this_dir, 'model', 'ted500'),
-        'emb_size': 300,
-        'batch_size': 100,
-        'num_kernel': 100,
-        'min_window': 3,
-        'max_window': 5,
-        'vocab_size': restore_param['vocab_size'],
-        'num_classes': len(restore_param['class_names']),
-        'sent_len': restore_param['max_sent_len'],
-        'l2_reg': 0.0
-    }
+    tf.app.flags.DEFINE_string('data_dir', os.path.join(this_dir, 'data', 'ted500'), 'Directory of the data')
+    tf.app.flags.DEFINE_string('train_dir', os.path.join(this_dir, 'model', 'ted500'), 'Where to read model')
+    FLAGS._parse_flags()
+
+    text = u"日本語のテスト。"
+    config = util.load_from_dump(os.path.join(FLAGS.train_dir, 'flags.cPickle'))
+    config['data_dir'] = FLAGS.data_dir
+    config['train_dir'] = FLAGS.train_dir
+
+    # predict
     result = predict(text, config, raw_text=True)
     language_codes = util.load_language_codes()
     print 'prediction = %s' % language_codes[result['prediction']]
     print 'scores = %s' % str({language_codes[k]: v for k, v in result['scores'].iteritems()})
 
+
 if __name__ == '__main__':
     tf.app.run()
-    #main()
-

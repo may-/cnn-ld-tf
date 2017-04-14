@@ -8,27 +8,30 @@ import tensorflow as tf
 
 # model parameters
 tf.app.flags.DEFINE_integer('batch_size', 100, 'Training batch size')
-tf.app.flags.DEFINE_integer('emb_size', 300, 'Size of word embeddings')
+tf.app.flags.DEFINE_integer('emb_size', 300, 'Dimension of word embeddings')
 tf.app.flags.DEFINE_integer('num_kernel', 100, 'Number of filters for each window size')
 tf.app.flags.DEFINE_integer('min_window', 3, 'Minimum size of filter window')
 tf.app.flags.DEFINE_integer('max_window', 5, 'Maximum size of filter window')
 tf.app.flags.DEFINE_integer('vocab_size', 4090, 'Vocabulary size')
 tf.app.flags.DEFINE_integer('num_classes', 65, 'Number of class to consider')
-tf.app.flags.DEFINE_integer('sent_len', 259, 'Input sentence length. This is after the padding is performed.')
-tf.app.flags.DEFINE_float('l2_reg', 0, 'l2 regularization weight')
+tf.app.flags.DEFINE_integer('sent_len', 257, 'Input sentence length (after padding)')
+tf.app.flags.DEFINE_float('l2_reg', 1e-5, 'l2 regularization weight')
+
 
 def _variable_on_cpu(name, shape, initializer):
     with tf.device('/cpu:0'):
         var = tf.get_variable(name, shape, initializer=initializer)
     return var
 
+
 def _variable_with_weight_decay(name, shape, initializer, wd):
     var = _variable_on_cpu(name, shape, initializer)
     if wd is not None and wd != 0.:
-        weight_decay = tf.mul(tf.nn.l2_loss(var), wd, name='weight_loss')
+        weight_decay = tf.multiply(tf.nn.l2_loss(var), wd, name='weight_loss')
     else:
         weight_decay = tf.constant(0.0, dtype=tf.float32)
     return var, weight_decay
+
 
 class Model(object):
 
@@ -50,8 +53,6 @@ class Model(object):
 
     def build_graph(self):
         """ Build the computation graph. """
-        #self._inputs = tf.placeholder(dtype=tf.int64, shape=[self.batch_size, self.sent_len], name='input_x')
-        #self._labels = tf.placeholder(dtype=tf.int64, shape=[self.batch_size], name='input_y')
         self._inputs = tf.placeholder(dtype=tf.int64, shape=[None, self.sent_len], name='input_x')
         self._labels = tf.placeholder(dtype=tf.float32, shape=[None, self.num_classes], name='input_y')
         losses = []
@@ -88,7 +89,7 @@ class Model(object):
         # Combine all pooled tensors
         num_windows = self.max_window - self.min_window + 1
         pool_size = num_windows * self.num_kernel
-        pool_layer = tf.concat(num_windows, pool_tensors, name='pool')
+        pool_layer = tf.concat(pool_tensors, num_windows, name='pool')
         pool_flat = tf.reshape(pool_layer, [-1, pool_size])
 
         # drop out layer
@@ -108,7 +109,8 @@ class Model(object):
 
         # loss
         with tf.variable_scope('loss') as scope:
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(self.logits, self._labels, name='cross_entropy_per_example')
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self._labels,
+                                                                    name='cross_entropy_per_example')
             cross_entropy_loss = tf.reduce_mean(cross_entropy, name='cross_entropy_loss')
             losses.append(cross_entropy_loss)
             self._total_loss = tf.add_n(losses, name='total_loss')
@@ -138,7 +140,7 @@ class Model(object):
             self._train_op = opt.apply_gradients(grads)
 
             for var in tf.trainable_variables():
-                tf.histogram_summary(var.op.name, var)
+                tf.summary.histogram(var.op.name, var)
         else:
             self._train_op = tf.no_op()
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import time
 import os
 import tensorflow as tf
 import numpy as np
@@ -9,19 +8,21 @@ import numpy as np
 import cnn
 import util
 
+
 FLAGS = tf.app.flags.FLAGS
 this_dir = os.path.abspath(os.path.dirname(__file__))
 
 tf.app.flags.DEFINE_string('data_dir', os.path.join(this_dir, 'data', 'ted500'), 'Directory of the data')
 tf.app.flags.DEFINE_string('train_dir', os.path.join(this_dir, 'model', 'ted500'), 'Where to read model')
-tf.app.flags.DEFINE_boolean('train_data', False, 'To evaluate on training data')
+tf.app.flags.DEFINE_boolean('train_data', False, 'Whether to evaluate on training data')
+
 
 def evaluate(config):
     """ Build evaluation graph and run. """
     with tf.Graph().as_default():
         with tf.variable_scope('cnn'):
             m = cnn.Model(config, is_train=False)
-        saver = tf.train.Saver(tf.all_variables())
+        saver = tf.train.Saver(tf.global_variables())
 
         # read test files
         if FLAGS.train_data:
@@ -41,11 +42,10 @@ def evaluate(config):
             else:
                 raise IOError("Loading checkpoint file failed!")
 
-
-            for _ in xrange(loader.num_batch):
+            for _ in range(loader.num_batch):
                 x_batch, y_batch = loader.next_batch()
                 scores, loss_value, true_count_value = sess.run([m.scores, m.total_loss, m.true_count_op],
-                                                        feed_dict={m.inputs: x_batch, m.labels: y_batch})
+                                                                feed_dict={m.inputs: x_batch, m.labels: y_batch})
 
                 predictions.extend(scores)
                 true_count += true_count_value
@@ -55,20 +55,16 @@ def evaluate(config):
             avg_loss = float(avg_loss) / loader.num_batch
             print '%s: test_loss = %.6f, test_accuracy = %.3f' % (datetime.now(), avg_loss, accuracy)
 
-            return predictions
 
 def main(argv=None):
     FLAGS._parse_flags()
-    config = dict(FLAGS.__flags.items())
-    util.dump_to_file(os.path.join(FLAGS.train_dir, 'flags.cPickle'), config)
-    restore_params = util.load_from_dump(os.path.join(FLAGS.data_dir, 'preprocess.cPickle'))
-    config['vocab_size'] = restore_params['vocab_size']
-    config['sent_len'] = restore_params['max_sent_len']
-    config['num_classes'] = len(restore_params['class_names'])
-    predictions = evaluate(config)
-    scores = np.vstack(tuple(predictions))
-    util.dump_to_file(os.path.join(FLAGS.data_dir, 'eval.cPickle'), scores)
+    config = util.load_from_dump(os.path.join(FLAGS.train_dir, 'flags.cPickle'))
+    config['data_dir'] = FLAGS.data_dir
+    config['train_dir'] = FLAGS.train_dir
+
+    # predict
+    evaluate(config)
+
 
 if __name__ == '__main__':
     tf.app.run()
-

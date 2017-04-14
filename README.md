@@ -25,15 +25,23 @@
 ## Requirements
 
 - [Python 2.7](https://www.python.org/)
-- [Tensorflow](https://www.tensorflow.org/) (tested with version 0.10.0rc0)
+- [Tensorflow](https://www.tensorflow.org/) (tested with version <strike>0.10.0rc0</strike> -> 1.0)
 - [Numpy](http://www.numpy.org/)
 
-To download TED corpus
+To train with pretrained embedding (`train.py --use_pretrain=True`)
+
+- [Gensim]()
+
+To download TED corpus (`ted.py`)
 
 - [Beautifulsoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
 - [Pandas](http://pandas.pydata.org/)
 
-Web API
+To visualize (`visualize.ipynb`)
+
+- [Scikit-learn]()
+
+Web API (`main.py`)
 
 - [Flask](http://flask.pocoo.org/)
 
