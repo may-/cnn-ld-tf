@@ -26,10 +26,10 @@ def evaluate(config):
 
         # read test files
         if FLAGS.train_data:
-            loader = util.DataLoader(FLAGS.data_dir, 'train.cPickle', batch_size=FLAGS.batch_size)
+            loader = util.DataLoader(FLAGS.data_dir, 'train3.pkl', batch_size=FLAGS.batch_size)
         else:
-            loader = util.DataLoader(FLAGS.data_dir, 'test.cPickle', batch_size=FLAGS.batch_size)
-        print 'Start evaluation, %d batches needed, with %d examples per batch.' % (loader.num_batch, FLAGS.batch_size)
+            loader = util.DataLoader(FLAGS.data_dir, 'test3.pkl', batch_size=FLAGS.batch_size)
+        print('Start evaluation, %d batches needed, with %d examples per batch.' % (loader.num_batch, FLAGS.batch_size))
 
         true_count = 0
         avg_loss = 0
@@ -53,12 +53,12 @@ def evaluate(config):
 
             accuracy = float(true_count) / loader._num_examples
             avg_loss = float(avg_loss) / loader.num_batch
-            print '%s: test_loss = %.6f, test_accuracy = %.3f' % (datetime.now(), avg_loss, accuracy)
+            print('%s: test_loss = %.6f, test_accuracy = %.3f' % (datetime.now(), avg_loss, accuracy))
 
 
 def main(argv=None):
     FLAGS._parse_flags()
-    config = util.load_from_dump(os.path.join(FLAGS.train_dir, 'flags.cPickle'))
+    config = util.load_from_dump(os.path.join(FLAGS.train_dir, 'flags3.pkl'))
     config['data_dir'] = FLAGS.data_dir
     config['train_dir'] = FLAGS.train_dir
 

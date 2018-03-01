@@ -19,7 +19,7 @@ def main():
     train_dir = os.path.join(this_dir, 'model', 'ted500')
 
     # restore config
-    config = util.load_from_dump(os.path.join(train_dir, 'flags.cPickle'))
+    config = util.load_from_dump(os.path.join(train_dir, 'flags3.pkl'))
     config['data_dir'] = data_dir
     config['train_dir'] = train_dir
 
@@ -28,7 +28,7 @@ def main():
     result = predict.predict(text, config, raw_text=True)
     language_codes = util.load_language_codes()
     res['prediction'] = language_codes[result['prediction']]
-    res['scores'] = {language_codes[k]: v for k, v in result['scores'].iteritems()}
+    res['scores'] = {language_codes[k]: v for k, v in result['scores'].items()}
     return json.dumps(res, ensure_ascii=False, indent=2)
 
 

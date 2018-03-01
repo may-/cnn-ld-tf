@@ -6,7 +6,7 @@ import re
 import glob
 from codecs import open as codecs_open
 from collections import Counter, defaultdict
-import cPickle as pickle
+import pickle
 import numpy as np
 
 
@@ -71,8 +71,8 @@ class TextReader(object):
         for idx, w in enumerate(word_list):
             self.word2id[w] = idx
         save_vocab(self.data_dir, self.word2id, vocab_size)
-        print '%d words found in training set. Truncated to vocabulary size %d.' % (total_words, vocab_size)
-        print 'Max sentence length in data is %d.' % (max_sent_len)
+        print('%d words found in training set. Truncated to vocabulary size %d.' % (total_words, vocab_size))
+        print('Max sentence length in data is %d.' % (max_sent_len))
         return
 
     def generate_id_data(self):
@@ -118,9 +118,9 @@ class TextReader(object):
         assert len(train_x) == len(train_y)
         assert len(test_x) == len(test_y)
 
-        dump_to_file(os.path.join(self.data_dir, 'train.cPickle'), (train_x, train_y))
-        dump_to_file(os.path.join(self.data_dir, 'test.cPickle'), (test_x, test_y))
-        print 'Split dataset into train/test set: %d for training, %d for evaluation.' % (len(train_y), len(test_y))
+        dump_to_file(os.path.join(self.data_dir, 'train3.pkl'), (train_x, train_y))
+        dump_to_file(os.path.join(self.data_dir, 'test3.pkl'), (test_x, test_y))
+        print('Split dataset into train/test set: %d for training, %d for evaluation.' % (len(train_y), len(test_y)))
         return len(train_y), len(test_y)
 
     def prepare_data(self, vocab_size=10000, test_size=50, shuffle=True):
@@ -136,7 +136,7 @@ class TextReader(object):
             'test_size': test_size,
             'train_size': train_size
         }
-        dump_to_file(os.path.join(self.data_dir, 'preprocess.cPickle'), preprocess_log)
+        dump_to_file(os.path.join(self.data_dir, 'preprocess3.pkl'), preprocess_log)
         return
 
 
@@ -156,12 +156,12 @@ class DataLoader(object):
         self.sent_len = len(self._x[0])
 
         self.num_classes = len(self._y[0])
-        self.class_names = load_from_dump(os.path.join(data_dir, 'preprocess.cPickle'))['class_names']
+        self.class_names = load_from_dump(os.path.join(data_dir, 'preprocess3.pkl'))['class_names']
         assert len(self.class_names) == self.num_classes
 
-        print 'Loaded target classes (length %d).' % len(self.class_names)
-        print 'Loaded data with %d examples. %d examples per batch will be used.' % \
-              (self._num_examples, self.batch_size)
+        print('Loaded target classes (length %d).' % len(self.class_names))
+        print('Loaded data with %d examples. %d examples per batch will be used.' % \
+              (self._num_examples, self.batch_size))
 
     def load_and_shuffle(self, data_dir, filename):
         _x, _y = load_from_dump(os.path.join(data_dir, filename))
@@ -201,15 +201,15 @@ class VocabLoader(object):
         self.restore(data_dir)
 
     def restore(self, data_dir):
-        class_file = os.path.join(data_dir, 'preprocess.cPickle')
+        class_file = os.path.join(data_dir, 'preprocess3.pkl')
         restore_params = load_from_dump(class_file)
         self.class_names = restore_params['class_names']
         self.max_sent_len = restore_params['max_sent_len']
-        print 'Loaded target classes (length %d).' % len(self.class_names)
+        print('Loaded target classes (length %d).' % len(self.class_names))
 
         vocab_file = os.path.join(data_dir, 'vocab.txt')
         self.word2id = load_vocab(vocab_file)
-        print 'Loaded vocabulary (size %d).' % len(self.word2id)
+        print('Loaded vocabulary (size %d).' % len(self.word2id))
 
     def text2id(self, raw_text):
         """
@@ -224,7 +224,7 @@ class VocabLoader(object):
         toks = char_tokenizer(raw_text)
         toks_len = len(toks)
         if toks_len <= max_sent_len:
-            pad_left = (max_sent_len - toks_len) / 2
+            pad_left = (max_sent_len - toks_len) // 2
             pad_right = int(np.ceil((max_sent_len - toks_len) / 2.0))
         else:
             return None
@@ -235,11 +235,11 @@ class VocabLoader(object):
 
 
 def sanitize_char(text):
-    text = re.sub(ur'<.*?>', '', text)              # html tags in subtitles
-    text = re.sub(ur'[0-9]', '', text)              # arabic numbers
-    text = re.sub(ur'[.,:|/"_\[\]()]', '', text)    # punctuations
-    text = re.sub(ur'[♫♪%–]', '', text)             # cross-lingual symbols
-    text = re.sub(ur' {2,}', ' ', text)             # more than two consective spaces
+    text = re.sub(r'<.*?>', '', text)              # html tags in subtitles
+    text = re.sub(r'[0-9]', '', text)              # arabic numbers
+    text = re.sub(r'[.,:|/"_\[\]()]', '', text)    # punctuations
+    text = re.sub(r'[♫♪%–]', '', text)             # cross-lingual symbols
+    text = re.sub(r' {2,}', ' ', text)             # more than two consective spaces
     return text.strip().lower()
 
 
@@ -263,7 +263,7 @@ def load_from_dump(filename):
 
 def load_embedding(emb_file, vocab_file, vocab_size):
     import gensim
-    print 'Reading pretrained word vectors from file ...'
+    print('Reading pretrained word vectors from file ...')
     word2id = load_vocab(vocab_file)
     word_vecs = gensim.models.KeyedVectors.load_word2vec_format(emb_file, encoding=ENCODING, binary=False)
     emb_size = word_vecs.syn0.shape[1]
@@ -274,7 +274,7 @@ def load_embedding(emb_file, vocab_file, vocab_size):
                 embedding[j, :] = word_vecs[word]
             else:
                 embedding[j, :] = np.random.uniform(-0.25, 0.25, emb_size)
-    print 'Generated embeddings with shape ' + str(embedding.shape)
+    print('Generated embeddings with shape ' + str(embedding.shape))
     return embedding
 
 
@@ -349,9 +349,9 @@ def load_unicode_block():
             m = re.match(r"(U\+[A-F0-9]{4})\t(U\+[A-F0-9]{4})", l[1])
             if m:
                 g = m.group(1, 2)
-                start = unicode('\u%s' % g[0][2:], "unicode_escape")
-                end = unicode('\u%s' % g[1][2:], "unicode_escape")
-                c = re.compile(ur'[%s-%s]' % (start, end))
+                start = (b'\u%s' % g[0][2:]).decode("unicode_escape")
+                end = (b'\u%s' % g[1][2:]).decode("unicode_escape")
+                c = re.compile(r'[%s-%s]' % (start, end))
                 ret.append((l[0], c))
     return ret
 

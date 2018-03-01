@@ -55,15 +55,15 @@ def main(argv=None):
     FLAGS._parse_flags()
 
     text = u"日本語のテスト。"
-    config = util.load_from_dump(os.path.join(FLAGS.train_dir, 'flags.cPickle'))
+    config = util.load_from_dump(os.path.join(FLAGS.train_dir, 'flags3.pkl'))
     config['data_dir'] = FLAGS.data_dir
     config['train_dir'] = FLAGS.train_dir
 
     # predict
     result = predict(text, config, raw_text=True)
     language_codes = util.load_language_codes()
-    print 'prediction = %s' % language_codes[result['prediction']]
-    print 'scores = %s' % str({language_codes[k]: v for k, v in result['scores'].iteritems()})
+    print('prediction = %s' % language_codes[result['prediction']])
+    print('scores = %s' % str({language_codes[k]: v for k, v in result['scores'].iteritems()}))
 
 
 if __name__ == '__main__':

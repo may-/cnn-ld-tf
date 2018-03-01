@@ -24,7 +24,7 @@ def load_titles(data_dir):
                 dic[href[7:]] = True
         return dic
 
-    print("\tLoading ted talk titles...")
+    print(("\tLoading ted talk titles..."))
     title_file = os.path.join(data_dir, 'TED_TALK_TITLES.csv')
     if os.path.exists(title_file):
         titles_df = pd.read_csv(title_file, sep='\t', header=None, names=['title'], index_col=0)
@@ -40,7 +40,7 @@ def load_titles(data_dir):
         title_df = pd.DataFrame(all_talk_titles, columns=['title'])
         title_df.to_csv(title_file, sep='\t', header=False)
 
-    print('\t\t%d titles found.' % len(titles_df.titles))
+    print(('\t\t%d titles found.' % len(titles_df.titles)))
     return titles_df
 
 
@@ -80,7 +80,7 @@ def load_transcriptions(data_dir):
     # Load titles
     title_df = load_titles(data_dir)
     files = []
-    print("\tLoading ted talk transcriptions...")
+    print(("\tLoading ted talk transcriptions..."))
     for doc_id, row in title_df.iterrows():
         title = row['title']
         orig_path = os.path.join(data_dir, 'orig', '%s.csv' % title)
@@ -107,7 +107,7 @@ def load_transcriptions(data_dir):
             filtered = df[pd.notnull(df[lang])][lang]
             filtered.to_csv(path, sep='\t', encoding='utf-8', index=False, header=False)
 
-    print('\t\t%d languages extracted.' % len(languages))
+    print(('\t\t%d languages extracted.' % len(languages)))
 
 
 def main():

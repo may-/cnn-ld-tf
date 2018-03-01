@@ -41,16 +41,16 @@ def train():
         os.mkdir(out_dir)
     FLAGS._parse_flags()
     config = dict(FLAGS.__flags.items())
-    util.dump_to_file(os.path.join(out_dir, 'flags.cPickle'), config)
-    print "Parameters:"
+    util.dump_to_file(os.path.join(out_dir, 'flags3.pkl'), config)
+    print("Parameters:")
     for k, v in config.iteritems():
-        print '%20s %r' % (k, v)
+        print('%20s %r' % (k, v))
 
     # load data
-    print "Preparing train data ..."
-    train_loader = util.DataLoader(FLAGS.data_dir, 'train.cPickle', batch_size=FLAGS.batch_size)
-    print "Preparing test data ..."
-    dev_loader = util.DataLoader(FLAGS.data_dir, 'test.cPickle', batch_size=FLAGS.batch_size)
+    print("Preparing train data ...")
+    train_loader = util.DataLoader(FLAGS.data_dir, 'train3.pkl', batch_size=FLAGS.batch_size)
+    print("Preparing test data ...")
+    dev_loader = util.DataLoader(FLAGS.data_dir, 'test3.pkl', batch_size=FLAGS.batch_size)
     max_steps = train_loader.num_batch * FLAGS.num_epoch
     config['num_classes'] = train_loader.num_classes
     config['sent_len'] = train_loader.sent_len
@@ -82,7 +82,7 @@ def train():
 
         # assign pretrained embeddings
         if FLAGS.use_pretrain:
-            print "Use pretrained embeddings to initialize model ..."
+            print("Use pretrained embeddings to initialize model ...")
             emb_file = os.path.join(FLAGS.data_dir, 'emb.txt')
             vocab_file = os.path.join(FLAGS.data_dir, 'vocab.txt')
             pretrained_embedding = util.load_embedding(emb_file, vocab_file, FLAGS.vocab_size)
@@ -110,7 +110,7 @@ def train():
             return dev_loss, dev_accuracy
 
         # train loop
-        print '\nStart training, %d batches needed, with %d examples per batch.' % (train_loader.num_batch, FLAGS.batch_size)
+        print('\nStart training, %d batches needed, with %d examples per batch.' % (train_loader.num_batch, FLAGS.batch_size))
         for epoch in range(FLAGS.num_epoch):
             train_loss = []
             train_accuracy = []
@@ -138,7 +138,7 @@ def train():
                     accuracy = float(true_count) / FLAGS.batch_size
                     format_str = '%s: step %d/%d (epoch %d/%d), acc = %.2f, loss = %.2f ' + \
                                  '(%.1f examples/sec; %.3f sec/batch), lr: %.6f'
-                    print format_str % (datetime.now(), global_step, max_steps, epoch+1, FLAGS.num_epoch,
+                    print(format_str % (datetime.now(), global_step, max_steps, epoch+1, FLAGS.num_epoch,)
                                         accuracy, loss_value, examples_per_sec, proc_duration, current_lr)
 
                 # write summary
@@ -157,8 +157,8 @@ def train():
                     summary_writer.add_summary(_summary('dev/loss', test_loss), global_step=global_step)
                     summary_writer.add_summary(_summary('dev/accuracy', test_accuracy), global_step=global_step)
 
-                    print "\nStep %d: train_loss = %.6f, train_accuracy = %.3f" % (global_step, train_loss_mean, train_accuracy_mean)
-                    print "Step %d:  test_loss = %.6f,  test_accuracy = %.3f\n" % (global_step, test_loss, test_accuracy)
+                    print("\nStep %d: train_loss = %.6f, train_accuracy = %.3f" % (global_step, train_loss_mean, train_accuracy_mean))
+                    print("Step %d:  test_loss = %.6f,  test_accuracy = %.3f\n" % (global_step, test_loss, test_accuracy))
 
                 # decay learning rate if necessary
                 if loss_value < lowest_loss_value:
@@ -168,8 +168,8 @@ def train():
                     decay_step_counter += 1
                 if decay_step_counter >= FLAGS.tolerance_step:
                     current_lr *= FLAGS.lr_decay
-                    print '%s: step %d/%d (epoch %d/%d), Learning rate decays to %.5f' % \
-                          (datetime.now(), global_step, max_steps, epoch+1, FLAGS.num_epoch, current_lr)
+                    print('%s: step %d/%d (epoch %d/%d), Learning rate decays to %.5f' % \
+                          (datetime.now(), global_step, max_steps, epoch+1, FLAGS.num_epoch, current_lr))
                     decay_step_counter = 0
 
                 # stop learning if learning rate is too low
