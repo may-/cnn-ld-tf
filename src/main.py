@@ -34,7 +34,7 @@ def main():
 
 @app.route('/favicon.ico')
 def favicon():
-    return flask.send_from_directory(os.path.join(app.root_path, 'docs', 'img'),
+    return flask.send_from_directory(os.path.join(app.root_path, 'web', 'img'),
                                      'favicon.ico', mimetype='image/png')
 
 @app.after_request

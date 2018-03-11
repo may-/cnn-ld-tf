@@ -24,7 +24,7 @@ You should see something like that (note the address)
 * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-Next, open `docs/index.html` in browser.  
+Next, open `web/index.html` in browser.  
 Ensure that `Backend-server` property matches the address you've seen before.  
 Fill the form with sample text and press `[Detect language]` button to perform detection.  
 If everything goes right, you will notice the plot and the scores updated.  
