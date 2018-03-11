@@ -17,7 +17,7 @@ WS_TOKEN = '<ws>'       # white space (for character embeddings)
 RANDOM_SEED = 1234
 ENCODING = 'utf-8'
 
-THIS_DIR = os.path.abspath(os.path.dirname(__file__))
+DATA_DIR = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, 'data'))
 
 
 class TextReader(object):
@@ -292,8 +292,8 @@ def load_vocab(filename):
     dic = dict()
     with codecs_open(filename, 'r', encoding=ENCODING) as f:
         for i, line in enumerate(f.readlines()):
-            if len(line.strip('\n')) > 0:
-                dic[line.strip('\n')] = i
+            if len(line.strip()) > 0:
+                dic[line.strip()] = i
     return dic
 
 
@@ -326,7 +326,7 @@ def save_vocab(data_dir, dic, max_size):
 
 def load_language_codes():
     ret = {}
-    path = os.path.join(THIS_DIR, 'language_codes.tsv')
+    path = os.path.join(DATA_DIR, 'language_codes.tsv')
     with codecs_open(path, 'r', encoding=ENCODING) as f:
         for line in f.readlines():
             if not line.startswith('#') and len(line.strip()) > 0:
@@ -342,7 +342,7 @@ def load_unicode_block():
     https://en.wikipedia.org/wiki/Unicode_block
     """
     ret = []
-    path = os.path.join(THIS_DIR, 'unicode_block.tsv')
+    path = os.path.join(DATA_DIR, 'unicode_block.tsv')
     with open(path, 'r') as f:
         for line in f.readlines():
             l = line.strip('\n').split('\t', 1)
@@ -357,7 +357,7 @@ def load_unicode_block():
 
 
 def main():
-    data_dir = os.path.join(THIS_DIR, 'data', 'ted500')
+    data_dir = os.path.join(DATA_DIR, 'ted500')
     class_names = [c.split('.')[-1] for c in glob.glob('data/ted500/ted_500.*')]
     reader = TextReader(data_dir, class_names=class_names)
     reader.prepare_data(vocab_size=4090, test_size=50)

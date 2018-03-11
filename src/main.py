@@ -9,14 +9,14 @@ import os
 
 
 app = flask.Flask(__name__)
-app.debug = True
+app.debug = False
 
 
 @app.route('/predict', methods=['GET'])
 def main():
-    this_dir = os.path.abspath(os.path.dirname(__file__))
-    data_dir = os.path.join(this_dir, 'data', 'ted500')
-    train_dir = os.path.join(this_dir, 'model', 'ted500')
+    root_dir = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
+    data_dir = os.path.join(root_dir, 'data', 'ted500')
+    train_dir = os.path.join(root_dir, 'model', 'ted500')
 
     # restore config
     config = util.load_from_dump(os.path.join(train_dir, 'flags3.pkl'))
