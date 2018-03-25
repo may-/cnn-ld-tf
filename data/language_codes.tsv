@@ -1,0 +1,307 @@
+#aa	Afar
+#ab	Abkhazian
+#ace	Acehnese
+#ady	Adyghe
+#af	Afrikaans
+#ak	Akan
+#als	Alemannic
+#am	Amharic
+#an	Aragonese
+#ang	Anglo-Saxon
+ar	Arabic
+#arc	Syriac
+#arq	Algerian Arabic
+#art-x-bork	Swedish Chef
+#arz	Egyptian Arabic
+#as	Assamese
+#ast	Asturian
+#av	Avar
+#ay	Aymara
+az	Azerbaijani
+#azb	Southern Azerbaijani
+#ba	Bashkir
+#bal	Balochi
+#bar	Bavarian
+#bat-smg	Samogitian
+#bcl	Central_Bicolano
+#be	Belarusian
+#be-x-old	Belarusian (Taraškievica)
+bg	Bulgarian
+#bh	Bhijpuri
+#bi	Bislama
+#bjn	Banjar
+#bm	Bambara
+bn	Bengali
+bo	Tibetan
+#bpy	Bishnupriya Manipuri
+#br	Breton
+#bs	Bosnian
+#bug	Buginese
+#bxr	Buryat (Russia)
+#ca	Catalan
+#cbk-zam	Zamboanga Chavacano
+#cdo	Min Dong
+#ce	Chechen
+#ceb	Cebuano
+#ch	Chamorro
+#cho	Choctaw
+#chr	Cherokee
+#chy	Cheyenne
+#ckb	Sorani Kurdish
+#cnh	Hakha Chin
+#co	Corsican
+#cr	Cree
+#crh	Crimean Tatar
+cs	Czech
+#csb	Kashubian
+#cu	Old Church Slavonic
+#cv	Chuvash
+#cy	Welsh
+da	Danish
+de	German
+#diq	Zazaki
+#dsb	Lower Sorbian
+#dv	Divehi
+#dz	Dzongkha
+#ee	Ewe
+el	Greek
+#eml	Emilian-Romagnol
+en	English
+#eo	Esperanto
+es	Spanish
+#et	Estonian
+#eu	Basque
+fa	Persian
+#ff	Fula
+fi	Finnish
+fil	Filipino
+#fiu-vro	Võro
+#fj	Fijian
+#fo	Faroese
+fr	French
+#fr-ca	Canadian French
+#frp	Franco-Provençal/Arpitan
+#frr	North Frisian
+#fur	Friulian
+#fy	West Frisian
+#ga	Irish
+#gag	Gagauz
+#gan	Gan Chinese
+#gd	Scottish Gaelic
+#gl	Galician
+#glk	Gilaki
+#gn	Guarani
+#gom	Goan Konkani
+#got	Gothic
+gu	Gujarati
+#gv	Manx
+#ha	Hausa
+#hak	Hakka
+#haw	Hawaiian
+he	Hebrew
+hi	Hindi
+#hif	Fiji Hindi
+#ho	Hiri Motu
+#hr	Croatian
+#hsb	Upper Sorbian
+ht	Haitian
+hu	Hungarian
+#hup	Hupa
+hy	Armenian
+#hz	Herero
+#ia	Interlingua
+id	Indonesian
+#ie	Interlingue
+#ig	Igbo
+#ii	Sichuan Yi
+#ik	Inupiak
+#ilo	Ilokano
+#inh	Ingush
+#io	Ido
+is	Icelandic
+it	Italian
+#iu	Inuktitut
+ja	Japanese
+#jbo	Lojban
+#jv	Javanese
+ka	Georgian
+#kaa	Karakalpak
+#kab	Kabyle
+#kbd	Kabardian
+#kg	Kongo
+#ki	Kikuyu
+#kj	Kuanyama
+#kk	Kazakh
+#kl	Greenlandic
+km	Khmer
+kn	Kannada
+ko	Korean
+#koi	Komi-Permyak
+#kr	Kanuri
+#krc	Karachay-Balkar
+#ks	Kashmiri
+#ksh	Ripuarian
+ku	Kurdish
+#kv	Komi
+#kw	Cornish
+#ky	Kyrgyz
+#la	Latin
+#lad	Ladino
+#lb	Luxembourgish
+#lbe	Lak
+#lez	Lezgian
+#lg	Luganda
+#li	Limburgish
+#lij	Ligurian
+#lmo	Lombard
+#ln	Lingala
+#lo	Lao
+#lrc	Northern Luri
+lt	Lithuanian
+#ltg	Latgalian
+#lv	Latvian
+#mai	Maithili
+#map-bms	Banyumasan
+#mdf	Moksha
+mg	Malagasy
+#mh	Marshallese
+#mhr	Meadow Mari
+#mi	Māori
+#min	Minangkabau
+#mk	Macedonian
+ml	Malayalam
+mn	Mongolian
+#mo	Moldovan
+#mr	Marathi
+#mrj	Hill Mari
+ms	Malay
+#mt	Maltese
+#mus	Muscogee
+#mwl	Mirandese
+my	Burmese
+#myv	Erzya
+#mzn	Mazandarani
+#na	Nauruan
+#nah	Nāhuatl
+#nap	Neapolitan
+nb	Norwegian Bokmal
+#nds	Low Saxon
+#nds-nl	Dutch Low Saxon
+ne	Nepali
+#new	Newar/Nepal Bhasa
+#ng	Ndonga
+nl	Dutch
+nn	Norwegian Nynorsk
+#no	Norwegian (Bokmål)
+#nov	Novial
+#nrm	Norman
+#nso	Northern Sotho
+#nv	Navajo
+#ny	Chichewa
+#oc	Occitan
+#om	Oromo
+#or	Oriya
+#os	Ossetian
+#pa	Punjabi
+#pag	Pangasinan
+#pam	Kapampangan
+#pap	Papiamentu
+#pcd	Picard
+#pdc	Pennsylvania German
+#pfl	Palatine German
+#pi	Pali
+#pih	Norfolk
+pl	Polish
+#pms	Piedmontese
+#pnb	Western Punjabi
+#pnt	Pontic
+ps	Pashto
+pt	Portuguese
+#pt-br	Brazilian Portuguese
+#qu	Quechua
+#rm	Romansh
+#rmy	Vlax Romani
+#rn	Kirundi
+ro	Romanian
+#roa-rup	Aromanian
+#roa-tara	Tarantino
+ru	Russian
+#rue	Rusyn
+#rup	Macedo
+#rw	Kinyarwanda
+#sa	Sanskrit
+#sah	Sakha
+#sc	Sardinian
+#scn	Sicilian
+#sco	Scots
+#sd	Sindhi
+#se	Northern Sami
+#sg	Sango
+#sh	Serbo-Croatian
+si	Sinhalese
+#simple	Simple English
+sk	Slovak
+sl	Slovenian
+#sm	Samoan
+#sn	Shona
+so	Somali
+sq	Albanian
+#sr	Serbian
+#srn	Sranan Tongo
+#srp	Montenegrin
+#ss	Swati
+#st	Sesotho
+#stq	Saterland Frisian
+#su	Sundanese
+sv	Swedish
+sw	Swahili
+#szl	Silesian
+ta	Tamil
+#tcy	Tulu
+te	Telugu
+#tet	Tetum
+tg	Tajik
+th	Thai
+#ti	Tigrinya
+#tk	Turkmen
+tl	Tagalog
+#tlh	Klingon
+#tn	Tswana
+#to	Tongan
+#tpi	Tok Pisin
+tr	Turkish
+#ts	Tsonga
+#tt	Tatar
+#tum	Tumbuka
+#tw	Twi
+#ty	Tahitian
+#tyv	Tuvan
+#udm	Udmurt
+ug	Uyghur
+uk	Ukrainian
+ur	Urdu
+uz	Uzbek
+#ve	Venda
+#vec	Venetian
+#vep	Veps
+vi	Vietnamese
+#vls	West Flemish
+#vo	Volapük
+#wa	Walloon
+#war	Waray
+#wo	Wolof
+#wuu	Wu
+#xal	Kalmyk
+#xh	Xhosa
+#xmf	Mingrelian
+#yi	Yiddish
+#yo	Yoruba
+#za	Zhuang
+#zea	Zealandic
+#zh	Chinese
+#zh-classical	Classical Chinese
+zh-cn	Simplified Chinese
+#zh-min-nan	Min Nan
+zh-tw	Traditional Chinese
+#zh-yue	Cantonese
+#zu	Zulu
