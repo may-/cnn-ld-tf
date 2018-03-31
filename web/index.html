@@ -24,68 +24,41 @@
 <body>
 <nav class="navbar navbar-default navbar-inverse">
     <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="https://github.com/may-/cnn-ld-tf">CNN-LD-TF</a>
-        </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Demo</a></li>
+                <li class="active"><a href="#">TextLang</a></li>
                 <li><a href="stat.html">Statistics</a></li>
-                <!--
-                <li><a href="#contact">Contact</a></li>
-                -->
             </ul>
         </div><!--/.nav-collapse -->
     </div>
 </nav>
-<a href="https://github.com/may-/cnn-ld-tf">
-    <img style="position: absolute; top: 0; right: 0; border: 0;"
-         src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
-         alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
-</a>
 <div id="page-body">
 <div class="container">
     <section class="container-fluid">
-        <h2>Demo: Convolutional Neural Network for Language Detection</h2>
+        <h2>TextLang: Language Detection System</h2>
         <div class="row wrapper">
             <div class="col-md-6">
                 <div class="row">
                 <form role="form" data-toggle="validator">
                     <div class="row element">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1">Backend-server</span>
-                            <input type="url" class="form-control" id="backend" aria-describedby="basic-addon1"
-                                   placeholder="http://localhost:5000" value="http://localhost:5000" required />
-                        </div>
+                        <span class="btn btn-primary btn-file">
+                            Select file<input type="file" id="set-text_from_file" accept=".txt">
+                        </span>
+                        <span class="note-label pull-center" id="filepath">
+                            No file chosen.
+                        </span>
                     </div>
-                    <!--
-                    <div class="row element">
-                        <div class="col-xs-5">
-                            <label for="wikimedia">Download from Wikipedia</label>
-                        </div>
-                        <div class="col-xs-6">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                    <span data-bind="label" style="min-width: 250px;">Select one</span>&nbsp;<span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li class="active"><a href="#">http://en.wikipedia.org (English)</a></li>
-                                    <li><a href="#">http://de.wikipedia.org (German)</a></li>
-                                    <li><a href="#">http://fr.wikipedia.org (French)</a></li>
-                                    <li><a href="#">http://ja.wikipedia.org (Japanese)</a></li>
-                                    <li><a href="#">http://ko.wikipedia.org (Korean)</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-xs-1">
-                            <button class="btn btn-default pull-right" type="button" id="get-wiki">Get</button>
-                        </div>
-                    </div>
-                    -->
                     <div class="row element">
                         <textarea class="form-control" rows="8" id="get-text" placeholder="Enter text here..." required>こんにちは</textarea>
                     </div>
                     <div class="row element">
+                        <span>
+                            Determine the language of the text in:
+                            <label for="one"> 
+                                <input type="radio" name="detect_from" value="textbox" checked> Textbox
+                                <input type="radio" name="detect_from" value="file"> File
+                            </label>
+                        </span>
                         <button type="submit" class="btn btn-primary btn-outline pull-right" id="send-text" href="">Detect Language</button>
                     </div>
                 </form>
