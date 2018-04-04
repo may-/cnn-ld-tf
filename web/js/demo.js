@@ -39,13 +39,12 @@ $(document).ready(function() {
 
   /* Redraw Prediction */
   $('#send-text').on('click', function() {
-
     var text = $("#get-text").val();
-    var host = $("#backend").val();
+    var host = 'http://localhost:5000';
     //sanitize
     text = text.replace(/(^[ '\^\$\*#&]+)|([ '\^\$\*#&]+$)/g, '')
     host = host.replace(/(\/)$/, '');
-    //console.log(host + "/predict?text=" + text);
+    console.log(host + "/predict?text=" + text);
 
     var pred = '';
     var scores = {};
@@ -120,42 +119,12 @@ $(document).ready(function() {
 
     return false; // abort reload
   });
-});
 
-/* Select Wiki */
-/*
-$(document).on('click', '.dropdown-menu li', function( event ) {
-  var $target = $( event.currentTarget );
-  $('.dropdown-menu li.active').toggleClass('active');
-  $target.toggleClass('active');
-  $target.closest( '.btn-group' )
-    .find( '[data-bind="label"]' ).text( $target.text() )
-    .end()
-    .children( '.dropdown-toggle' ).dropdown( 'toggle' );
-  return false;
-});
-*/
-
-/* Get wiki article*/
-/*
-$(document).on('click', '#get-wiki', function() {
-  var host = $('.dropdown-menu li.active').text().split(" ")[0];
-  var base_path = host + "/w/api.php?format=xml&action=query&list=random&rnnamespace=0&rnlimit=1";
-  //console.log('host', base_path);
-
-  $.ajax({
-    type: "GET",
-    url: base_path,
-    contentType: "application/json; charset=utf-8",
-    async: false,
-    dataType: "json",
-    success: function (data) {
-      alert(data);
-    },
-    error: function(XMLHttpRequest, textStatus, errorThrown){
-      alert('Error : ' + errorThrown);
-    }
+  $('#set-text_from_file').change(function (event) {
+      var filePath = $(this).val();
+      $('#filepath').text(filePath);
+      jQuery.get(filePath, function(data) {
+          console.log(data);
+      });
   });
 });
-*/
-
