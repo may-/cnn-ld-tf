@@ -12,7 +12,7 @@ app = flask.Flask(__name__)
 app.debug = False
 
 
-@app.route('/predict', methods=['GET'])
+@app.route('/predict', methods=['POST'])
 def main():
     root_dir = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
     data_dir = os.path.join(root_dir, 'data', 'ted500')

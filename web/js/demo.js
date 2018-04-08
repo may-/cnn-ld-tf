@@ -49,10 +49,11 @@ $(document).ready(function() {
     var pred = '';
     var scores = {};
     $.ajax({
-      type: "GET",
+      type: "POST",
       url: host + "/predict?text=" + text,
       contentType: "application/json; charset=utf-8",
       async: false,
+      processData: false,
       dataType: "json",
       success: function (data) {
         //console.log(data);
@@ -120,11 +121,22 @@ $(document).ready(function() {
     return false; // abort reload
   });
 
-  $('#set-text_from_file').change(function (event) {
-      var filePath = $(this).val();
-      $('#filepath').text(filePath);
-      jQuery.get(filePath, function(data) {
-          console.log(data);
-      });
+  $('#set-text-from-file').change(function (event) {
+      // var filePath = $(this).val();
+      // $('#filepath').text(filePath);
+      // jQuery.get(filePath, function(data) {
+      //     console.log(data);
+      // });
+      //var tmppath = URL.createObjectURL(event.target.files[0]); 
+
+      var fileToLoad = document.getElementById("set-text-from-file").files[0];
+   
+      var fileReader = new FileReader();
+      fileReader.onload = function(fileLoadedEvent) 
+      {
+          var textFromFileLoaded = fileLoadedEvent.target.result;
+          document.getElementById("get-text").value = textFromFileLoaded;
+      };
+      fileReader.readAsText(fileToLoad, "UTF-8"); 
   });
 });
