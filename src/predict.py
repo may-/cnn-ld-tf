@@ -6,9 +6,30 @@ import numpy as np
 
 import cnn
 import util
+import operator
+
+def predict(text, config, raw_text=True):
+    vocab = util.VocabLoader(config['data_dir'])
+    class_names = vocab.class_names
+    max_s = vocab.max_sent_len
+    result_scores = {}
+    if len(text) > max_s:
+        for i in range(0, len(text) - max_s, max_s):
+            t = text[i : i + max_s]
+            ret = predict_part(t, config, raw_text=True)
+            if not result_scores:
+                result_scores = ret['scores']
+            else:
+                result_scores = { k: ret['scores'].get(k, 0) + result_scores.get(k, 0) for k in set(ret['scores']) | set(result_scores) }
+    else:
+        result_scores = predict_part(text, config, raw_text=True)['scores']
+    result = {}
+    result['scores'] = result_scores
+    result['prediction'] = max(result_scores.items(), key=operator.itemgetter(1))[0]
+    return result
 
 
-def predict(x, config, raw_text=True):
+def predict_part(x, config, raw_text=True):
     """ Build evaluation graph and run. """
     if raw_text:
         vocab = util.VocabLoader(config['data_dir'])
