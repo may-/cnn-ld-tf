@@ -1,0 +1,216 @@
+html,
+body {
+    height: 100%;
+}
+
+#page-body{
+    height: auto;
+    margin-bottom: 30px;
+}
+
+.footer {
+    height: auto;
+    border-top: 1px solid #efefef;
+}
+
+.clearfix{
+    clear: both;
+}
+
+.wrapper{
+    margin-top: 50px;
+}
+
+.element{
+    margin: 10px 0;
+}
+
+.info-panel{
+    margin: 20px;
+}
+
+.annotation-item .panel-footer .btn:not(.active){
+    opacity: 0.6;
+}
+
+.annotation-item .panel-footer .glyphicon{
+    margin: auto 10px;
+    font-size: large;
+    top: 5px;
+}
+
+#timer{
+    font-size: xx-large;
+}
+
+.note{
+    padding-top: 20px;
+}
+
+.note-label{
+    font-weight: bold;
+}
+
+.code{
+    background-color: #efefef;
+    margin-top: 10px;
+    padding: 10px 10px 10px 30px;
+}
+
+.code span{
+    display: block;
+    font-family: Monaco;
+    font-size: small;
+}
+
+.table{
+    border-bottom: 1px solid #ddd;
+}
+
+.panel-default{
+    margin: 20px;
+}
+
+.col-md-6 #chartContainer{
+    height: 400px;
+}
+
+/* tooltip */
+#collapseThree th span{
+    color: #999;
+    text-decoration: none;
+}
+#collapseThree th span.active{
+    color: #333;
+}
+
+#collapseThree th span:hover,
+#collapseThree th span:focus{
+    cursor: help;
+}
+
+/* backdrop */
+.modal-backdrop #backdrop-container{
+    position: relative;
+    height: 100%;
+    text-align: center;
+}
+.modal-backdrop #backdrop-container .uil-default-css{
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* form */
+.asterisk:after{
+    content: '*';
+    color: red;
+    margin-left: 5px;
+}
+
+.input-group .round-input:first-child,
+.input-group .round-input:last-child{
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+/* accordion */
+.accordion {
+    margin: 20px;
+}
+.accordion-group {
+    margin-bottom: 2px;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+.accordion-heading {
+    border-bottom: 0;
+    background-color: #f5f5f5;
+}
+.accordion-heading a,
+.accordion-heading a:hover,
+.accordion-heading a:focus{
+    text-decoration: None;
+    color: #555;
+
+}
+.accordion-heading .accordion-toggle {
+    display: block;
+    padding: 8px 15px;
+}
+.accordion-toggle {
+    cursor: pointer;
+}
+.accordion-inner {
+    padding: 9px 15px;
+    border-top: 1px solid #e5e5e5;
+    min-height: 100px;
+}
+
+/* btn-outline */
+.btn-outline {
+    background-color: transparent;
+    color: inherit;
+    transition: all .5s;
+}
+
+.btn-primary.btn-outline {
+    color: #428bca;
+}
+
+.btn-success.btn-outline {
+    color: #5cb85c;
+}
+
+.btn-info.btn-outline {
+    color: #5bc0de;
+}
+
+.btn-warning.btn-outline {
+    color: #f0ad4e;
+}
+
+.btn-danger.btn-outline {
+    color: #d9534f;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;   
+    cursor: inherit;
+    display: block;
+}
+
+.btn-primary.btn-outline:hover,
+.btn-success.btn-outline:hover,
+.btn-info.btn-outline:hover,
+.btn-warning.btn-outline:hover,
+.btn-danger.btn-outline:hover,
+.btn-primary.btn-outline:focus,
+.btn-success.btn-outline:focus,
+.btn-info.btn-outline:focus,
+.btn-warning.btn-outline:focus,
+.btn-danger.btn-outline:focus{
+    color: #fff;
+}
+

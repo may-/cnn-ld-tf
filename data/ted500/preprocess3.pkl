@@ -1,0 +1,4 @@
+€}q(U
+train_sizeMBrU
+vocab_sizeMúUmax_sent_lenMUclass_names]q(UelqUguqUenqUswqUisqUitqUsvq	Ubgq
+UukqUcsqUazqUidqUesqUpsqUnlqUnnqUzh-cnqUzh-twqUnbqUtrqUneqUsiqUltqUtlqUthqUviqUtgqUroqUfilqUtaq Ufrq!Uhyq"Umsq#Uruq$Ubnq%Uboq&Umgq'Uhtq(Uhuq)Ufaq*Uhiq+Ufiq,Udaq-Ujaq.Uheq/Ukaq0Uteq1Uptq2Uuzq3Umlq4Usqq5Umnq6Ukoq7Uknq8Ukmq9Uurq:Uskq;Udeq<Uarq=Usoq>Uplq?Ukuq@UslqAUugqBUmyqCeU	test_sizeM²u.

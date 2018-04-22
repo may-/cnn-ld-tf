@@ -6,3 +6,5 @@
 train/
 
 data/ted500/ted_500.*
+/venv
+/__pycache__
